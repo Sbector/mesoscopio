@@ -1,7 +1,5 @@
 ---
-title: laura
+title: laura1Cuerpo
 description: Objeto no identificado.
 model: /models/laura/cuerpo70k.glb
 ---
-
-Dos piezas de cerámica con presunto interés arqueológico.
