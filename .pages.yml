@@ -1,0 +1,33 @@
+media:
+  input: public/models
+  output: /models
+
+content:
+  - name: modelos
+    label: Modelos 3D
+    type: collection
+    path: src/data/modelos
+    format: yaml-frontmatter
+
+    filename: "{primary}.md"
+
+    fields:
+      - name: title
+        label: Título
+        type: string
+
+      - name: description
+        label: Descripción
+        type: text
+        required: false
+
+      - name: model
+        label: Modelo (.glb)
+        type: file
+        options:
+          extensions: [glb, gLTF]
+
+      - name: preview
+        label: Imagen preview
+        type: image
+        required: false
