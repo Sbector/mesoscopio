@@ -1,0 +1,25 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import { getCollection } from "astro:content";
+import ModelViewer from "@/components/ModelViewer.jsx";
+
+export async function getStaticPaths() {
+    const modelos = await getCollection("modelos");
+
+    return modelos.map((item) => ({
+        params: { slug: item.id },
+        props: { item },
+    }));
+}
+
+const { item } = Astro.props;
+const { title, description, model } = item.data;
+---
+
+<Layout>
+    <h1 class="text-3xl font-bold mb-4">{title}</h1>
+
+    {description && <p class="mb-6 text-neutral-400">{description}</p>}
+
+    <ModelViewer client:visible model={model} />
+</Layout>

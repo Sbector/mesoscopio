@@ -1,0 +1,26 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import { getCollection } from "astro:content";
+
+const modelos = await getCollection("modelos");
+console.log(modelos);
+---
+
+<Layout>
+	<h1 class="text-2xl mb-6">Modelos</h1>
+
+	<ul class="grid grid-cols-2 gap-4">
+		{
+			modelos.map((item) => (
+				<li>
+					<a
+						href={`/modelos/${item.id}`}
+						class="block p-4 bg-neutral-900 rounded-lg hover:bg-neutral-800"
+					>
+						{item.data.title}
+					</a>
+				</li>
+			))
+		}
+	</ul>
+</Layout>

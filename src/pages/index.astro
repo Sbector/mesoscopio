@@ -1,14 +1,11 @@
 ---
-import Layout from '../layouts/Layout.astro';
-import ModelViewer from "../components/ModelViewer.jsx";
+import Layout from "@/layouts/Layout.astro";
+import { getCollection } from "astro:content";
+
+const modelos = await getCollection("modelos");
+console.log(modelos);
 ---
 
 <Layout>
-	<div class="fixed z-10">
-		<h1 class="text-amber-100 text-4xl">Mesoscopio</h1>
-	</div>
-	<ModelViewer 
-	client:visible 
-	model="/models/laura/cuerpo70k.glb"
-	model2="/models/laura/cabeza70k.glb" />
+	<a href="/modelos">Modelos</a>
 </Layout>
