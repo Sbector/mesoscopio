@@ -1,11 +1,61 @@
 ---
 import Layout from "@/layouts/Layout.astro";
+import HeroSection from "@/components/HeroSection.astro";
+import AboutSection from "@/components/AboutSection.astro";
+import FundraisingSection from "@/components/FundraisingSection.astro";
+import Footer from "@/components/Footer.astro";
 import { getCollection } from "astro:content";
 
+// Get landing content
+const landingDocs = await getCollection("landing");
+const landingData = landingDocs[0];
+
+// Get models for hero
 const modelos = await getCollection("modelos");
-console.log(modelos);
+const heroModel = modelos[0]?.data.model;
+
+if (!landingData) {
+  throw new Error("Landing content not found");
+}
+
+const data = landingData.data;
+
+// Page meta uses Spanish (default language) for SEO
+const pageTitle = `${data.title_es || data.title_en} | Mesoscopio`;
+const pageDescription = data.description_es || data.description_en;
 ---
 
-<Layout>
-	<a href="/modelos">Modelos</a>
+<Layout
+  title={pageTitle}
+  description={pageDescription}
+  lang="es"
+  showLangSelector={true}
+>
+  <!-- Main Content -->
+  <main class="grow">
+    <HeroSection
+      title_en={data.title_en}
+      title_es={data.title_es}
+      description_en={data.description_en}
+      description_es={data.description_es}
+      cta_text_en={data.cta_text_en}
+      cta_text_es={data.cta_text_es}
+      ctaUrl={data.cta_url || "#"}
+      modelUrl={heroModel}
+    />
+
+    <AboutSection
+      title_en="About the Project"
+      title_es="Sobre el Proyecto"
+      content_en="Mesoscopio is an advanced 3D capture system designed to create high-fidelity digital replicas of physical objects. Using specialized lighting, precision hardware, and computational photography techniques, we transform real objects into detailed 3D models."
+      content_es="Mesoscopio es un sistema avanzado de captura 3D diseñado para crear réplicas digitales de alta fidelidad de objetos físicos. Utilizando iluminación especializada, hardware de precisión y técnicas de fotografía computacional, transformamos objetos reales en modelos 3D detallados."
+    />
+
+    <FundraisingSection
+      goal_en={data.fundraising_goal_en}
+      goal_es={data.fundraising_goal_es}
+    />
+  </main>
+
+  <Footer />
 </Layout>

@@ -1,0 +1,43 @@
+---
+// Language selector — fully client-side, no server props needed
+---
+
+<div class="flex items-center gap-2">
+  <button data-lang-btn="en" class="lang-btn">
+    EN
+  </button>
+  <button data-lang-btn="es" class="lang-btn">
+    ES
+  </button>
+</div>
+
+<script>
+  function setLang(lang: string): void {
+    document.documentElement.dataset.lang = lang;
+    const url = new URL(window.location.href);
+    url.searchParams.set('lang', lang);
+    history.pushState({}, '', url.toString());
+    updateButtons(lang);
+  }
+
+  function updateButtons(lang: string): void {
+    document.querySelectorAll<HTMLButtonElement>('[data-lang-btn]').forEach(btn => {
+      if (btn.dataset.langBtn === lang) {
+        btn.classList.add('is-active');
+      } else {
+        btn.classList.remove('is-active');
+      }
+    });
+  }
+
+  // Initialize active button from current html[data-lang]
+  const initLang = document.documentElement.dataset.lang || 'es';
+  updateButtons(initLang);
+
+  // Wire up click handlers
+  document.querySelectorAll<HTMLButtonElement>('[data-lang-btn]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      setLang(btn.dataset.langBtn || 'es');
+    });
+  });
+</script>

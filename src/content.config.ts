@@ -9,8 +9,29 @@ const modelos = defineCollection({
   schema: z.object({
     title: z.string(),
     description: z.string().optional(),
-    model: z.string(), // 🔥 ruta al .glb
+    model: z.string(),
+    preview: z.string().optional(),
   }),
 });
 
-export const collections = { modelos };
+const landing = defineCollection({
+  loader: glob({
+    pattern: "**/*.md",
+    base: "./src/data/landing",
+  }),
+  schema: z.object({
+    title_en: z.string(),
+    title_es: z.string(),
+    description_en: z.string(),
+    description_es: z.string(),
+    fundraising_goal_en: z.string(),
+    fundraising_goal_es: z.string(),
+    cta_text_en: z.string(),
+    cta_text_es: z.string(),
+    cta_url: z.string(),
+    footer_text_en: z.string(),
+    footer_text_es: z.string(),
+  }),
+});
+
+export const collections = { modelos, landing };

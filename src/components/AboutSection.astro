@@ -1,0 +1,25 @@
+---
+interface Props {
+  title_en: string
+  title_es: string
+  content_en: string
+  content_es: string
+}
+
+const { title_en, title_es, content_en, content_es } = Astro.props
+---
+
+<section class="w-full py-16 px-4 sm:px-6 lg:px-8 bg-earth-50 dark:bg-earth-900">
+  <div class="max-w-4xl mx-auto">
+    <div class="space-y-4">
+      <h2 class="text-3xl font-bold tracking-tight text-earth-900 dark:text-earth-50">
+        <span data-i18n="en">{title_en}</span>
+        <span data-i18n="es">{title_es}</span>
+      </h2>
+      <p class="text-lg text-earth-700 dark:text-earth-300 leading-relaxed">
+        <span data-i18n="en">{content_en}</span>
+        <span data-i18n="es">{content_es}</span>
+      </p>
+    </div>
+  </div>
+</section>

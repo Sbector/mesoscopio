@@ -31,3 +31,55 @@ content:
         label: Imagen preview
         type: image
         required: false
+
+  - name: landing
+    label: Landing Page
+    type: collection
+    path: src/data/landing
+    format: yaml-frontmatter
+    filename: "{primary}.md"
+
+    fields:
+      - name: title_en
+        label: Título (EN)
+        type: string
+
+      - name: title_es
+        label: Título (ES)
+        type: string
+
+      - name: description_en
+        label: Descripción (EN)
+        type: text
+
+      - name: description_es
+        label: Descripción (ES)
+        type: text
+
+      - name: fundraising_goal_en
+        label: Objetivo de Recaudación (EN)
+        type: text
+
+      - name: fundraising_goal_es
+        label: Objetivo de Recaudación (ES)
+        type: text
+
+      - name: cta_text_en
+        label: Texto CTA (EN)
+        type: string
+
+      - name: cta_text_es
+        label: Texto CTA (ES)
+        type: string
+
+      - name: cta_url
+        label: URL CTA
+        type: string
+
+      - name: footer_text_en
+        label: Texto Footer (EN)
+        type: string
+
+      - name: footer_text_es
+        label: Texto Footer (ES)
+        type: string

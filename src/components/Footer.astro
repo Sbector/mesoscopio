@@ -1,0 +1,63 @@
+---
+interface Props {
+  contactEmail?: string
+}
+
+const { contactEmail = "hola@sbector.com" } = Astro.props
+---
+
+<footer class="w-full py-12 px-4 sm:px-6 lg:px-8 bg-earth-900 dark:bg-earth-950 text-earth-50">
+  <div class="max-w-6xl mx-auto">
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-8 mb-8">
+      <!-- Brand -->
+      <div>
+        <h3 class="font-bold text-lg mb-2">Mesoscopio</h3>
+        <p class="text-earth-300 text-sm">
+          <span data-i18n="en">Advancing 3D capture technology for detailed digital replicas.</span>
+          <span data-i18n="es">Tecnología avanzada de captura 3D para réplicas digitales detalladas.</span>
+        </p>
+      </div>
+
+      <!-- Links -->
+      <div>
+        <h4 class="font-semibold mb-3">
+          <span data-i18n="en">Links</span>
+          <span data-i18n="es">Vínculos</span>
+        </h4>
+        <ul class="space-y-2 text-sm text-earth-300">
+          <li>
+            <a href="/modelos" class="hover:text-earth-100 transition-colors">
+              <span data-i18n="en">Gallery</span>
+              <span data-i18n="es">Galería</span>
+            </a>
+          </li>
+          <li>
+            <a href="#" class="hover:text-earth-100 transition-colors">
+              <span data-i18n="en">About</span>
+              <span data-i18n="es">Acerca de</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Contact -->
+      <div>
+        <h4 class="font-semibold mb-3">
+          <span data-i18n="en">Contact</span>
+          <span data-i18n="es">Contacto</span>
+        </h4>
+        <a href={`mailto:${contactEmail}`} class="text-clay-400 hover:text-clay-300 transition-colors text-sm">
+          {contactEmail}
+        </a>
+      </div>
+    </div>
+
+    <div class="border-t border-earth-800 dark:border-earth-700 pt-8 text-center text-earth-400 text-sm">
+      <p>
+        © 2026 Mesoscopio.
+        <span data-i18n="en">All rights reserved.</span>
+        <span data-i18n="es">Todos los derechos reservados.</span>
+      </p>
+    </div>
+  </div>
+</footer>

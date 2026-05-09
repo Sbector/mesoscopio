@@ -1,0 +1,61 @@
+---
+interface Item { label: string; description: string }
+
+interface Props {
+  title_en?: string
+  title_es?: string
+  goal_en: string
+  goal_es: string
+  items_en?: Item[]
+  items_es?: Item[]
+}
+
+const {
+  title_en = "Fundraising Goal",
+  title_es = "Objetivo de Recaudación",
+  goal_en,
+  goal_es,
+  items_en = [
+    { label: "Nikon D610",          description: "Full-frame camera for quality imaging" },
+    { label: "Lighting System",     description: "Enhanced cross-polarization setup" },
+    { label: "Turntable Upgrade",   description: "New gears for precision rotation" },
+    { label: "Raspberry Pi Control",description: "Modern automation system" },
+  ],
+  items_es = [
+    { label: "Nikon D610",              description: "Cámara de fotograma completo para imágenes de calidad" },
+    { label: "Sistema de iluminación",  description: "Configuración mejorada de polarización cruzada" },
+    { label: "Mejora de la plataforma", description: "Nuevos engranajes para rotación de precisión" },
+    { label: "Control Raspberry Pi",    description: "Sistema de automatización moderno" },
+  ],
+} = Astro.props
+---
+
+<section class="w-full py-16 px-4 sm:px-6 lg:px-8 bg-earth-100 dark:bg-earth-800">
+  <div class="max-w-6xl mx-auto space-y-12">
+    <div class="text-center space-y-4">
+      <h2 class="text-3xl font-bold tracking-tight text-earth-900 dark:text-earth-50">
+        <span data-i18n="en">{title_en}</span>
+        <span data-i18n="es">{title_es}</span>
+      </h2>
+      <p class="text-lg text-earth-700 dark:text-earth-300 max-w-3xl mx-auto leading-relaxed">
+        <span data-i18n="en">{goal_en}</span>
+        <span data-i18n="es">{goal_es}</span>
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      {items_en.map((item, i) => (
+        <div class="p-6 bg-earth-50 dark:bg-earth-700 rounded-lg border border-earth-200 dark:border-earth-600 shadow-sm hover:shadow-md transition-shadow">
+          <h3 class="font-semibold text-lg text-earth-900 dark:text-earth-50 mb-2">
+            <span data-i18n="en">{item.label}</span>
+            <span data-i18n="es">{items_es[i]?.label ?? item.label}</span>
+          </h3>
+          <p class="text-earth-600 dark:text-earth-300 text-sm">
+            <span data-i18n="en">{item.description}</span>
+            <span data-i18n="es">{items_es[i]?.description ?? item.description}</span>
+          </p>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>

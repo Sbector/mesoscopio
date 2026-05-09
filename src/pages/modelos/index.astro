@@ -3,24 +3,48 @@ import Layout from "@/layouts/Layout.astro";
 import { getCollection } from "astro:content";
 
 const modelos = await getCollection("modelos");
-console.log(modelos);
 ---
 
-<Layout>
-	<h1 class="text-2xl mb-6">Modelos</h1>
+<Layout backUrl="/" backLabel="Home">
+	<main class="grow p-6 sm:p-10">
+		<div class="max-w-6xl mx-auto">
+			<h1 class="text-4xl font-bold mb-8 text-earth-900 dark:text-earth-50">Gallery</h1>
 
-	<ul class="grid grid-cols-2 gap-4">
-		{
-			modelos.map((item) => (
-				<li>
-					<a
-						href={`/modelos/${item.id}`}
-						class="block p-4 bg-neutral-900 rounded-lg hover:bg-neutral-800"
-					>
-						{item.data.title}
-					</a>
-				</li>
-			))
-		}
-	</ul>
+			<ul class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+				{
+					modelos.map((item) => (
+						<li>
+							<a
+								href={`/modelos/${item.id}`}
+								class="group block overflow-hidden rounded-lg border border-earth-200 dark:border-earth-700 bg-earth-50 dark:bg-earth-800 hover:border-clay-400 dark:hover:border-clay-400 transition-all"
+							>
+								{/* Preview Image */}
+								{item.data.preview && (
+									<div class="relative w-full h-48 overflow-hidden bg-earth-100 dark:bg-earth-700">
+										<img
+											src={item.data.preview}
+											alt={item.data.title}
+											class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+										/>
+									</div>
+								)}
+
+								{/* Content */}
+								<div class="p-4 space-y-2">
+									<h2 class="text-lg font-semibold text-earth-900 dark:text-earth-50 group-hover:text-clay-500 dark:group-hover:text-clay-400 transition-colors">
+										{item.data.title}
+									</h2>
+									{item.data.description && (
+										<p class="text-sm text-earth-600 dark:text-earth-300">
+											{item.data.description}
+										</p>
+									)}
+								</div>
+							</a>
+						</li>
+					))
+				}
+			</ul>
+		</div>
+	</main>
 </Layout>

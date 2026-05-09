@@ -1,8 +1,119 @@
 @import "tailwindcss";
 
-html,
-body {
-    margin: 0;
-    width: 100%;
-    height: 100%;
+/* Enable class-based dark mode (required for Tailwind v4) */
+@variant dark (&:where(.dark, .dark *));
+
+/* ================================================================
+   COOL GREEN-GRAY COLOR SYSTEM — Edit here to change the entire palette
+   Includes light and dark mode variants for all three color families
+   ================================================================ */
+@theme {
+  /* Earth: cool green-gray (light to dark) — backgrounds & surfaces */
+  --color-earth-50:  #F4F7F4;
+  --color-earth-100: #E8ECEB;
+  --color-earth-200: #D6DDD8;
+  --color-earth-300: #BCCCC1;
+  --color-earth-400: #9DB399;
+  --color-earth-500: #7A9A78;
+  --color-earth-600: #5F7F5E;
+  --color-earth-700: #466448;
+  --color-earth-800: #2D4A2C;
+  --color-earth-900: #050B04;
+
+  /* Clay: muted forest green (light salmon → deep brick repurposed) — CTAs & accents */
+  --color-clay-50:  #EEF5EE;
+  --color-clay-100: #DDE9DC;
+  --color-clay-200: #BDD2BC;
+  --color-clay-300: #9EB39B;
+  --color-clay-400: #6D9B6B;
+  --color-clay-500: #206C1B;
+  --color-clay-600: #1A5515;
+  --color-clay-700: #144010;
+  --color-clay-800: #0D2A0A;
+  --color-clay-900: #051402;
+
+  /* Moss: neutral gray-green (sage → forest) — secondary elements */
+  --color-moss-50:  #F4F7F4;
+  --color-moss-100: #E8ECEB;
+  --color-moss-200: #D6DDD8;
+  --color-moss-300: #BCCCC1;
+  --color-moss-400: #9DB399;
+  --color-moss-500: #475749;
+  --color-moss-600: #3A4A3B;
+  --color-moss-700: #2E3B2F;
+  --color-moss-800: #222C23;
+  --color-moss-900: #131B14;
+
+  /* Custom spacing — enables h-125, w-125, etc. */
+  --spacing-125: 31.25rem; /* 500px — used by ModelViewer */
 }
+
+@layer base {
+  html,
+  body {
+    @apply m-0 w-full antialiased;
+  }
+
+  body {
+    @apply bg-earth-50 text-earth-900 dark:bg-earth-900 dark:text-earth-50;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-bold tracking-tight text-earth-900 dark:text-earth-50;
+  }
+
+  h1 { @apply text-4xl sm:text-5xl; }
+  h2 { @apply text-3xl sm:text-4xl; }
+  h3 { @apply text-2xl sm:text-3xl; }
+
+  p {
+    @apply leading-relaxed text-earth-700 dark:text-earth-300;
+  }
+
+  a {
+    @apply transition-colors duration-200;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply px-6 py-3 bg-clay-500 hover:bg-clay-600 text-earth-50 font-semibold rounded-lg transition-colors duration-200;
+  }
+
+  .btn-secondary {
+    @apply px-6 py-3 bg-earth-200 text-earth-800 font-semibold rounded-lg hover:bg-earth-300 dark:bg-earth-700 dark:text-earth-100 dark:hover:bg-earth-600 transition-colors duration-200;
+  }
+
+  .section-container {
+    @apply w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+
+  /* Language toggle buttons */
+  .lang-btn {
+    @apply px-3 py-1 rounded text-sm font-medium transition-colors
+      bg-earth-200 dark:bg-earth-700 text-earth-900 dark:text-earth-200
+      hover:bg-earth-300 dark:hover:bg-earth-600;
+  }
+  .lang-btn.is-active {
+    @apply bg-clay-500 text-earth-50 hover:bg-clay-600;
+  }
+
+  /* Fullscreen: expand model viewer to fill screen */
+  .model-viewer-container:fullscreen,
+  .model-viewer-container:-webkit-full-screen,
+  .model-viewer-container:-moz-full-screen {
+    @apply h-screen w-screen rounded-none;
+  }
+}
+
+/* ================================================================
+   INTERNATIONALIZATION — Client-side language switching
+   html[data-lang] is set before first paint by the anti-FOFL script
+   ================================================================ */
+html[data-lang="en"] [data-i18n="es"] { display: none !important; }
+html[data-lang="es"] [data-i18n="en"] { display: none !important; }

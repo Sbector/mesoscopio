@@ -1,18 +1,64 @@
 ---
 import '@/styles/global.css'
+import NavBar from '@/components/NavBar.astro'
+
+interface Props {
+  title?: string
+  description?: string
+  lang?: 'en' | 'es'
+  backUrl?: string
+  backLabel?: string
+  showLangSelector?: boolean
+  currentLang?: 'en' | 'es'
+}
+
+const {
+  title = 'Mesoscopio',
+  description = 'Mesoscopio - Advanced 3D Capture',
+  lang = 'en',
+  backUrl,
+  backLabel,
+  showLangSelector = false,
+  currentLang = 'en',
+} = Astro.props
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang={lang} data-lang="es">
 	<head>
 		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<meta name="description" content={description} />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<link rel="icon" href="/favicon.ico" />
 		<meta name="generator" content={Astro.generator} />
-		<title>Mesoscopio</title>
+		<title>{title}</title>
+
+		<!-- Anti-FOUC: Apply theme immediately before first paint -->
+		<script is:inline>
+			const html = document.documentElement
+			const storedTheme = localStorage.getItem('theme')
+			if (
+				storedTheme === 'dark' ||
+				(!storedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)
+			) {
+				html.classList.add('dark')
+			} else {
+				html.classList.remove('dark')
+			}
+			// Anti-FOFL: Set active language from URL before first paint
+			html.dataset.lang = new URLSearchParams(location.search).get('lang') || 'es'
+		</script>
 	</head>
-	<body class="block">
-		<slot />
+	<body class="antialiased">
+		<NavBar
+			backUrl={backUrl}
+			backLabel={backLabel}
+			showLangSelector={showLangSelector}
+			currentLang={currentLang}
+		/>
+		<div class="min-h-screen flex flex-col">
+			<slot />
+		</div>
 	</body>
 </html>
