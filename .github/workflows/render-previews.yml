@@ -57,6 +57,7 @@ jobs:
           BASE_URL: http://localhost:4321
 
       - name: Commit and push
+        id: commit
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
@@ -64,4 +65,14 @@ jobs:
           if ! git diff --staged --quiet; then
             git commit -m "chore: generate model previews [skip ci]"
             git push
+            echo "committed=true" >> $GITHUB_OUTPUT
+          else
+            echo "committed=false" >> $GITHUB_OUTPUT
           fi
+
+      - name: Trigger Netlify deploy
+        if: steps.commit.outputs.committed == 'true'
+        run: |
+          curl -X POST ${{ secrets.NETLIFY_BUILD_HOOK_URL }} \
+            -H "Content-Type: application/json" \
+            -d '{}'
