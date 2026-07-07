@@ -11,7 +11,7 @@ const { title, description, preview, video, href } = Astro.props
 ---
 
 <a href={href} class="group block h-full" data-scrub-link>
-  <figure class="scrub-card relative w-full aspect-square overflow-hidden rounded-lg border border-earth-200 dark:border-earth-700 bg-earth-100 dark:bg-earth-700 hover:border-clay-400 dark:hover:border-clay-400 transition-all duration-300" data-scrub-card style="touch-action: pan-y;">
+  <figure class="scrub-card relative w-full aspect-square overflow-hidden rounded-lg border border-earth-200 dark:border-earth-700 bg-earth-100 dark:bg-earth-700 hover:border-clay-400 dark:hover:border-clay-400 transition-all duration-300" data-scrub-card style="touch-action: none;">
     <!-- Video: always visible if available, with scrub interaction -->
     {video ? (
       <video
@@ -76,6 +76,7 @@ const { title, description, preview, video, href } = Astro.props
           let dragStartX = 0;
           let pendingRatio: number | null = null;
           let rafId: number | null = null;
+          let cachedRect: DOMRect | null = null;
           const dragThreshold = 8; // px
 
           // Initialize video: always paused at frame 0
@@ -106,13 +107,14 @@ const { title, description, preview, video, href } = Astro.props
             
             dragStartX = evt.clientX;
             hasDragged = false;
+            cachedRect = card.getBoundingClientRect();
             card.setPointerCapture(evt.pointerId);
           });
 
           // Move: scrub on mouse/drag, or show overlay on touch drag
           card.addEventListener('pointermove', (e) => {
             const evt = e as PointerEvent;
-            const rect = card.getBoundingClientRect();
+            const rect = cachedRect || card.getBoundingClientRect();
             const x = evt.clientX - rect.left;
             
             // Desktop mouse scrub
@@ -161,8 +163,23 @@ const { title, description, preview, video, href } = Astro.props
               rafId = null;
             }
             pendingRatio = null;
+            cachedRect = null;
             videoEl.pause();
             videoEl.currentTime = 0;
+          });
+
+          // Handle pointercancel (iOS/iPadOS system interruption)
+          card.addEventListener('pointercancel', () => {
+            card.classList.remove('is-scrubbing');
+            if (rafId !== null) {
+              cancelAnimationFrame(rafId);
+              rafId = null;
+            }
+            pendingRatio = null;
+            cachedRect = null;
+            videoEl.pause();
+            videoEl.currentTime = 0;
+            hasDragged = false;
           });
 
           // Prevent navigation if user dragged
