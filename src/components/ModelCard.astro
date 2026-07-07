@@ -39,19 +39,19 @@ const { title, description, preview, video, href } = Astro.props
       )
     )}
 
-    <!-- Overlay: text info and scrub hint -->
-    <div class="absolute inset-0 bg-black/60 backdrop-blur-sm opacity-0 group-hover:opacity-100 scrub-overlay transition-opacity duration-300 flex items-end p-4">
+    <!-- Text overlay: shown on hover (desktop) or touch (mobile) -->
+    <div class="absolute bottom-0 left-0 right-0 bg-linear-to-b from-transparent to-white/20 opacity-0 group-hover:opacity-100 scrub-overlay transition-opacity duration-300 p-4">
       <div class="w-full">
-        <h3 class="text-white font-semibold text-sm sm:text-base truncate">
+        <h3 class="text-earth-900 dark:text-earth-900 font-semibold text-sm sm:text-base truncate">
           {title}
         </h3>
         {description && (
-          <p class="text-white/80 text-xs sm:text-sm line-clamp-2 mt-1">
+          <p class="text-earth-700 dark:text-earth-700 text-xs sm:text-sm line-clamp-2 mt-1">
             {description}
           </p>
         )}
         {video && (
-          <p class="text-white/60 text-xs mt-2">Drag to rotate →</p>
+          <p class="text-earth-600 dark:text-earth-600 text-xs mt-2">Drag to rotate →</p>
         )}
       </div>
     </div>
