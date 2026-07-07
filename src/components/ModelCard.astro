@@ -74,11 +74,21 @@ const { title, description, preview, video, href } = Astro.props
           let isScrubbing = false;
           let hasDragged = false;
           let dragStartX = 0;
+          let pendingRatio: number | null = null;
+          let rafId: number | null = null;
           const dragThreshold = 8; // px
 
           // Initialize video: always paused at frame 0
           videoEl.pause();
           videoEl.currentTime = 0;
+
+          // Schedule RAF to apply pending seek
+          const applyScrub = () => {
+            if (pendingRatio !== null && videoEl.duration) {
+              videoEl.currentTime = pendingRatio * videoEl.duration;
+            }
+            rafId = null;
+          };
 
           // Desktop: Hover enables scrub mode
           card.addEventListener('pointerenter', (e) => {
@@ -88,7 +98,7 @@ const { title, description, preview, video, href } = Astro.props
             }
           });
 
-          // Touch/pen start: record position for drag detection
+          // Touch/pen start: record position for drag detection + capture pointer
           card.addEventListener('pointerdown', (e) => {
             const evt = e as PointerEvent;
             if (evt.pointerType !== 'touch' && evt.pointerType !== 'pen') return;
@@ -96,6 +106,7 @@ const { title, description, preview, video, href } = Astro.props
             
             dragStartX = evt.clientX;
             hasDragged = false;
+            card.setPointerCapture(evt.pointerId);
           });
 
           // Move: scrub on mouse/drag, or show overlay on touch drag
@@ -107,14 +118,7 @@ const { title, description, preview, video, href } = Astro.props
             // Desktop mouse scrub
             if (isScrubbing && evt.pointerType === 'mouse') {
               const ratio = Math.max(0, Math.min(1, x / rect.width));
-              if (videoEl.duration) {
-                const targetTime = ratio * videoEl.duration;
-                if (videoEl.fastSeek) {
-                  videoEl.fastSeek(targetTime);
-                } else {
-                  videoEl.currentTime = targetTime;
-                }
-              }
+              videoEl.currentTime = ratio * videoEl.duration;
             }
             
             // Touch/pen drag detection and scrub
@@ -125,15 +129,12 @@ const { title, description, preview, video, href } = Astro.props
                 hasDragged = true;
                 card.classList.add('is-scrubbing');
                 
-                // Scrub to frame based on position
+                // Queue seek via RAF for smooth scrubbing
                 const ratio = Math.max(0, Math.min(1, x / rect.width));
-                if (videoEl.duration) {
-                  const targetTime = ratio * videoEl.duration;
-                  if (videoEl.fastSeek) {
-                    videoEl.fastSeek(targetTime);
-                  } else {
-                    videoEl.currentTime = targetTime;
-                  }
+                pendingRatio = ratio;
+                
+                if (rafId === null) {
+                  rafId = requestAnimationFrame(applyScrub);
                 }
               }
             }
@@ -143,6 +144,11 @@ const { title, description, preview, video, href } = Astro.props
           card.addEventListener('pointerleave', () => {
             isScrubbing = false;
             card.classList.remove('is-scrubbing');
+            if (rafId !== null) {
+              cancelAnimationFrame(rafId);
+              rafId = null;
+            }
+            pendingRatio = null;
             videoEl.pause();
             videoEl.currentTime = 0;
             hasDragged = false;
@@ -150,6 +156,11 @@ const { title, description, preview, video, href } = Astro.props
 
           card.addEventListener('pointerup', () => {
             card.classList.remove('is-scrubbing');
+            if (rafId !== null) {
+              cancelAnimationFrame(rafId);
+              rafId = null;
+            }
+            pendingRatio = null;
             videoEl.pause();
             videoEl.currentTime = 0;
           });
