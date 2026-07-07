@@ -1,0 +1,49 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import ModelCard from './ModelCard.astro';
+
+interface Props {
+  models: CollectionEntry<'modelos'>[]
+}
+
+const { models } = Astro.props
+---
+
+<section id="modelos" class="w-full py-16 px-4 sm:px-6 lg:px-8 bg-earth-50 dark:bg-earth-900">
+  <div class="max-w-6xl mx-auto">
+    <!-- Section Header -->
+    <div class="mb-12 text-center">
+      <h2 class="text-3xl sm:text-4xl font-bold text-earth-900 dark:text-earth-50 mb-2">
+        <span data-i18n="en">Scanned Models</span>
+        <span data-i18n="es">Modelos Escaneados</span>
+      </h2>
+      <p class="text-earth-600 dark:text-earth-300">
+        <span data-i18n="en">Explore our collection of high-fidelity 3D scans</span>
+        <span data-i18n="es">Explora nuestra colección de escaneos 3D de alta fidelidad</span>
+      </p>
+    </div>
+
+    <!-- Grid -->
+    <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
+      {models.map((model) => (
+        <ModelCard
+          title={model.data.title}
+          description={model.data.description}
+          preview={model.data.preview}
+          video={model.data.video}
+          href={`/modelos/${model.id}`}
+        />
+      ))}
+    </div>
+
+    <!-- Empty state (if no models) -->
+    {models.length === 0 && (
+      <div class="text-center py-12">
+        <p class="text-earth-600 dark:text-earth-300">
+          <span data-i18n="en">No models available yet.</span>
+          <span data-i18n="es">No hay modelos disponibles aún.</span>
+        </p>
+      </div>
+    )}
+  </div>
+</section>

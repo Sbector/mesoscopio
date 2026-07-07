@@ -8,41 +8,41 @@
    Includes light and dark mode variants for all three color families
    ================================================================ */
 @theme {
-  /* Earth: cool green-gray (light to dark) — backgrounds & surfaces */
-  --color-earth-50:  #F4F7F4;
-  --color-earth-100: #E8ECEB;
-  --color-earth-200: #D6DDD8;
-  --color-earth-300: #BCCCC1;
-  --color-earth-400: #9DB399;
-  --color-earth-500: #7A9A78;
-  --color-earth-600: #5F7F5E;
-  --color-earth-700: #466448;
-  --color-earth-800: #2D4A2C;
-  --color-earth-900: #050B04;
+  /* Earth: neutral gray (light to dark) — backgrounds & surfaces */
+  --color-earth-50:  #F9FAFB;
+  --color-earth-100: #F3F4F6;
+  --color-earth-200: #E5E7EB;
+  --color-earth-300: #D1D5DB;
+  --color-earth-400: #9CA3AF;
+  --color-earth-500: #6B7280;
+  --color-earth-600: #4B5563;
+  --color-earth-700: #374151;
+  --color-earth-800: #1F2937;
+  --color-earth-900: #111827;
 
-  /* Clay: muted forest green (light salmon → deep brick repurposed) — CTAs & accents */
-  --color-clay-50:  #EEF5EE;
-  --color-clay-100: #DDE9DC;
-  --color-clay-200: #BDD2BC;
-  --color-clay-300: #9EB39B;
-  --color-clay-400: #6D9B6B;
-  --color-clay-500: #206C1B;
-  --color-clay-600: #1A5515;
-  --color-clay-700: #144010;
-  --color-clay-800: #0D2A0A;
-  --color-clay-900: #051402;
+  /* Clay: zinc gray (light to dark) — CTAs & accents */
+  --color-clay-50:  #FAFAFA;
+  --color-clay-100: #F4F4F5;
+  --color-clay-200: #E4E4E7;
+  --color-clay-300: #D4D4D8;
+  --color-clay-400: #A1A1AA;
+  --color-clay-500: #71717A;
+  --color-clay-600: #52525B;
+  --color-clay-700: #3F3F46;
+  --color-clay-800: #27272A;
+  --color-clay-900: #18181B;
 
-  /* Moss: neutral gray-green (sage → forest) — secondary elements */
-  --color-moss-50:  #F4F7F4;
-  --color-moss-100: #E8ECEB;
-  --color-moss-200: #D6DDD8;
-  --color-moss-300: #BCCCC1;
-  --color-moss-400: #9DB399;
-  --color-moss-500: #475749;
-  --color-moss-600: #3A4A3B;
-  --color-moss-700: #2E3B2F;
-  --color-moss-800: #222C23;
-  --color-moss-900: #131B14;
+  /* Moss: neutral gray (light to dark) — secondary elements */
+  --color-moss-50:  #F9FAFB;
+  --color-moss-100: #F3F4F6;
+  --color-moss-200: #E5E7EB;
+  --color-moss-300: #D1D5DB;
+  --color-moss-400: #9CA3AF;
+  --color-moss-500: #6B7280;
+  --color-moss-600: #4B5563;
+  --color-moss-700: #374151;
+  --color-moss-800: #1F2937;
+  --color-moss-900: #111827;
 
   /* Custom spacing — enables h-125, w-125, etc. */
   --spacing-125: 31.25rem; /* 500px — used by ModelViewer */
@@ -107,7 +107,19 @@
   .model-viewer-container:fullscreen,
   .model-viewer-container:-webkit-full-screen,
   .model-viewer-container:-moz-full-screen {
-    @apply h-screen w-screen rounded-none;
+    @apply h-screen w-screen rounded-none bg-earth-50;
+  }
+
+  /* Model card media animations with prefers-reduced-motion support */
+  .model-card-media {
+    @apply transition-transform duration-300;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .model-card-media,
+    .model-card-media * {
+      @apply !transition-none !duration-0;
+    }
   }
 }
 

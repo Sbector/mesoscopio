@@ -34,20 +34,10 @@ const {
 		<meta name="generator" content={Astro.generator} />
 		<title>{title}</title>
 
-		<!-- Anti-FOUC: Apply theme immediately before first paint -->
+		<!-- Anti-FOUC: Apply light theme always -->
 		<script is:inline>
-			const html = document.documentElement
-			const storedTheme = localStorage.getItem('theme')
-			if (
-				storedTheme === 'dark' ||
-				(!storedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)
-			) {
-				html.classList.add('dark')
-			} else {
-				html.classList.remove('dark')
-			}
-			// Anti-FOFL: Set active language from URL before first paint
-			html.dataset.lang = new URLSearchParams(location.search).get('lang') || 'es'
+			document.documentElement.classList.remove('dark')
+			document.documentElement.dataset.lang = new URLSearchParams(location.search).get('lang') || 'es'
 		</script>
 	</head>
 	<body class="antialiased">

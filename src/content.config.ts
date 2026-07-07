@@ -11,6 +11,8 @@ const modelos = defineCollection({
     description: z.string().optional(),
     model: z.string(),
     preview: z.string().optional(),
+    video: z.string().optional(),
+    model_hash: z.string().optional(),
   }),
 });
 

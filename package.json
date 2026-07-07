@@ -9,7 +9,8 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "render:preview": "node scripts/render-preview.js"
   },
   "dependencies": {
     "@astrojs/react": "^5.0.2",
@@ -24,5 +25,10 @@
     "rect": "^1.2.1",
     "tailwindcss": "^4.2.2",
     "three": "^0.183.2"
+  },
+  "devDependencies": {
+    "playwright": "^1.48.0",
+    "gray-matter": "^4.0.3",
+    "wait-on": "^8.0.1"
   }
 }

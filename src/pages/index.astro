@@ -1,6 +1,7 @@
 ---
 import Layout from "@/layouts/Layout.astro";
 import HeroSection from "@/components/HeroSection.astro";
+import ModelsGrid from "@/components/ModelsGrid.astro";
 import AboutSection from "@/components/AboutSection.astro";
 import FundraisingSection from "@/components/FundraisingSection.astro";
 import Footer from "@/components/Footer.astro";
@@ -10,9 +11,8 @@ import { getCollection } from "astro:content";
 const landingDocs = await getCollection("landing");
 const landingData = landingDocs[0];
 
-// Get models for hero
+// Get models
 const modelos = await getCollection("modelos");
-const heroModel = modelos[0]?.data.model;
 
 if (!landingData) {
   throw new Error("Landing content not found");
@@ -40,9 +40,10 @@ const pageDescription = data.description_es || data.description_en;
       description_es={data.description_es}
       cta_text_en={data.cta_text_en}
       cta_text_es={data.cta_text_es}
-      ctaUrl={data.cta_url || "#"}
-      modelUrl={heroModel}
+      ctaUrl="#modelos"
     />
+
+    <ModelsGrid models={modelos} />
 
     <AboutSection
       title_en="About the Project"

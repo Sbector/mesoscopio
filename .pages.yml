@@ -32,6 +32,16 @@ content:
         type: image
         required: false
 
+      - name: video
+        label: Video preview
+        type: string
+        hidden: true
+
+      - name: model_hash
+        label: Model hash
+        type: string
+        hidden: true
+
   - name: landing
     label: Landing Page
     type: collection
