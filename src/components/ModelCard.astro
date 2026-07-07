@@ -10,8 +10,8 @@ interface Props {
 const { title, description, preview, video, href } = Astro.props
 ---
 
-<a href={href} class="group block h-full">
-  <figure class="scrub-card relative w-full aspect-square overflow-hidden rounded-lg border border-earth-200 dark:border-earth-700 bg-earth-100 dark:bg-earth-700 hover:border-clay-400 dark:hover:border-clay-400 transition-all duration-300" data-scrub-card>
+<a href={href} class="group block h-full" data-scrub-link>
+  <figure class="scrub-card relative w-full aspect-square overflow-hidden rounded-lg border border-earth-200 dark:border-earth-700 bg-earth-100 dark:bg-earth-700 hover:border-clay-400 dark:hover:border-clay-400 transition-all duration-300" data-scrub-card style="touch-action: pan-y;">
     <!-- Video: always visible if available, with scrub interaction -->
     {video ? (
       <video
@@ -31,7 +31,7 @@ const { title, description, preview, video, href } = Astro.props
           loading="lazy"
         />
       ) : (
-        <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-earth-200 to-earth-300 dark:from-earth-700 dark:to-earth-800">
+        <div class="w-full h-full flex items-center justify-center bg-linear-to-br from-earth-200 to-earth-300 dark:from-earth-700 dark:to-earth-800">
           <div class="text-center">
             <div class="text-earth-600 dark:text-earth-400 text-sm">No preview</div>
           </div>
@@ -40,7 +40,7 @@ const { title, description, preview, video, href } = Astro.props
     )}
 
     <!-- Overlay: text info and scrub hint -->
-    <div class="absolute inset-0 bg-black/60 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
+    <div class="absolute inset-0 bg-black/60 backdrop-blur-sm opacity-0 group-hover:opacity-100 scrub-overlay transition-opacity duration-300 flex items-end p-4">
       <div class="w-full">
         <h3 class="text-white font-semibold text-sm sm:text-base truncate">
           {title}
@@ -59,65 +59,126 @@ const { title, description, preview, video, href } = Astro.props
 </a>
 
 {video && (
-  <script>
-    // Scrub 3D interaction: fixed frame 0 by default, scrub only on hover
-    function initScrubCards() {
-      const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      const cards = document.querySelectorAll('[data-scrub-card]');
-      
-      cards.forEach((card) => {
-        const videoEl = card.querySelector('.scrub-video');
-        if (!videoEl) return;
+  <>
+    <script>
+      // Scrub 3D interaction: desktop hover + mobile touch drag
+      function initScrubCards() {
+        const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        const cards = document.querySelectorAll('[data-scrub-card]');
+        
+        cards.forEach((card) => {
+          const videoEl = card.querySelector('.scrub-video') as HTMLVideoElement | null;
+          const link = card.closest('[data-scrub-link]');
+          if (!videoEl || !link) return;
 
-        let isScrubbing = false;
+          let isScrubbing = false;
+          let hasDragged = false;
+          let dragStartX = 0;
+          const dragThreshold = 8; // px
 
-        // Initialize video: always paused at frame 0
-        videoEl.pause();
-        videoEl.currentTime = 0;
-
-        // Hover: enable scrub mode
-        card.addEventListener('pointerenter', () => {
-          if (!prefersReduced) {
-            isScrubbing = true;
-          }
-        });
-
-        // Move: scrub to frame based on cursor position
-        card.addEventListener('pointermove', (e) => {
-          if (!isScrubbing || !videoEl) return;
-
-          const rect = card.getBoundingClientRect();
-          const x = e.clientX - rect.left;
-          const ratio = Math.max(0, Math.min(1, x / rect.width));
-          
-          if (videoEl.duration) {
-            const targetTime = ratio * videoEl.duration;
-            // Use fastSeek if available (Firefox), else currentTime
-            if (videoEl.fastSeek) {
-              videoEl.fastSeek(targetTime);
-            } else {
-              videoEl.currentTime = targetTime;
-            }
-          }
-        });
-
-        // Leave: return to frame 0
-        card.addEventListener('pointerleave', () => {
-          isScrubbing = false;
+          // Initialize video: always paused at frame 0
           videoEl.pause();
           videoEl.currentTime = 0;
+
+          // Desktop: Hover enables scrub mode
+          card.addEventListener('pointerenter', (e) => {
+            const evt = e as PointerEvent;
+            if (!prefersReduced && evt.pointerType === 'mouse') {
+              isScrubbing = true;
+            }
+          });
+
+          // Touch/pen start: record position for drag detection
+          card.addEventListener('pointerdown', (e) => {
+            const evt = e as PointerEvent;
+            if (evt.pointerType !== 'touch' && evt.pointerType !== 'pen') return;
+            if (prefersReduced) return;
+            
+            dragStartX = evt.clientX;
+            hasDragged = false;
+          });
+
+          // Move: scrub on mouse/drag, or show overlay on touch drag
+          card.addEventListener('pointermove', (e) => {
+            const evt = e as PointerEvent;
+            const rect = card.getBoundingClientRect();
+            const x = evt.clientX - rect.left;
+            
+            // Desktop mouse scrub
+            if (isScrubbing && evt.pointerType === 'mouse') {
+              const ratio = Math.max(0, Math.min(1, x / rect.width));
+              if (videoEl.duration) {
+                const targetTime = ratio * videoEl.duration;
+                if (videoEl.fastSeek) {
+                  videoEl.fastSeek(targetTime);
+                } else {
+                  videoEl.currentTime = targetTime;
+                }
+              }
+            }
+            
+            // Touch/pen drag detection and scrub
+            if ((evt.pointerType === 'touch' || evt.pointerType === 'pen') && dragStartX !== undefined) {
+              const dragDelta = Math.abs(evt.clientX - dragStartX);
+              
+              if (dragDelta > dragThreshold) {
+                hasDragged = true;
+                card.classList.add('is-scrubbing');
+                
+                // Scrub to frame based on position
+                const ratio = Math.max(0, Math.min(1, x / rect.width));
+                if (videoEl.duration) {
+                  const targetTime = ratio * videoEl.duration;
+                  if (videoEl.fastSeek) {
+                    videoEl.fastSeek(targetTime);
+                  } else {
+                    videoEl.currentTime = targetTime;
+                  }
+                }
+              }
+            }
+          });
+
+          // End scrub mode or reset state
+          card.addEventListener('pointerleave', () => {
+            isScrubbing = false;
+            card.classList.remove('is-scrubbing');
+            videoEl.pause();
+            videoEl.currentTime = 0;
+            hasDragged = false;
+          });
+
+          card.addEventListener('pointerup', () => {
+            card.classList.remove('is-scrubbing');
+            videoEl.pause();
+            videoEl.currentTime = 0;
+          });
+
+          // Prevent navigation if user dragged
+          link.addEventListener('click', (e) => {
+            if (hasDragged) {
+              e.preventDefault();
+              hasDragged = false;
+            }
+          });
         });
-      });
-    }
+      }
 
-    // Initialize on page load and when islands mount
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', initScrubCards);
-    } else {
-      initScrubCards();
-    }
+      // Initialize on page load and when islands mount
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initScrubCards);
+      } else {
+        initScrubCards();
+      }
 
-    // Re-init on Astro page navigation (view transitions)
-    document.addEventListener('astro:before-preparation', initScrubCards);
-  </script>
+      // Re-init on Astro page navigation (view transitions)
+      document.addEventListener('astro:before-preparation', initScrubCards);
+    </script>
+    
+    <style>
+      .scrub-card.is-scrubbing .scrub-overlay {
+        @apply opacity-100;
+      }
+    </style>
+  </>
 )}
