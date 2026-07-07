@@ -25,9 +25,6 @@ jobs:
         with:
           version: latest
 
-      - name: Approve required build scripts
-        run: pnpm approve-builds esbuild@0.27.5 sharp@0.34.5
-
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
