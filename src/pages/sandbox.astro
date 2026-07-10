@@ -1,0 +1,31 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Sandbox from "@/components/Sandbox.jsx";
+import { getCollection } from "astro:content";
+
+// Get all models
+const modelos = await getCollection("modelos");
+
+// Serialize model data for React component
+const modelsList = modelos.map((model) => ({
+  id: model.id,
+  title: model.data.title,
+  model: model.data.model,
+  preview: model.data.preview,
+  video: model.data.video,
+}));
+
+// Pass as JSON string to avoid Astro type issues
+const modelsJSON = JSON.stringify(modelsList);
+---
+
+<Layout
+  title="Sandbox | Mesoscopio"
+  description="Multi-model 3D editor sandbox"
+  lang="es"
+  showLangSelector={true}
+>
+  <main class="grow w-full h-screen overflow-hidden">
+    <Sandbox client:only="react" modelsJSON={modelsJSON} />
+  </main>
+</Layout>

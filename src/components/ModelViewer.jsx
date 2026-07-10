@@ -6,11 +6,24 @@ import {
   Bounds,
   Center,
 } from "@react-three/drei";
-import { Suspense, useState, useRef, useEffect } from "react";
+import { Suspense, useState, useRef, useEffect, useLayoutEffect } from "react";
+import { Box3, Vector3 } from "three";
 
 // ---------- MODELO ----------
 function Model({ url }) {
   const { scene } = useGLTF(url);
+
+  // Center the geometry at the local origin (0,0,0)
+  useLayoutEffect(() => {
+    if (!scene) return;
+    
+    const box = new Box3().setFromObject(scene);
+    const center = new Vector3();
+    box.getCenter(center);
+    
+    // Shift the geometry so its center aligns with local origin
+    scene.position.sub(center);
+  }, [scene]);
 
   return (
     <primitive object={scene} />
@@ -21,6 +34,7 @@ function Model({ url }) {
 export default function ModelViewer({ model }) {
   const [autoRotate, setAutoRotate] = useState(true);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  
   const containerRef = useRef(null);
 
   useEffect(() => {

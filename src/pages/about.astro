@@ -1,0 +1,37 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import AboutSection from "@/components/AboutSection.astro";
+import FundraisingSection from "@/components/FundraisingSection.astro";
+import { getCollection } from "astro:content";
+
+// Get landing content
+const landingDocs = await getCollection("landing");
+const landingData = landingDocs[0];
+
+if (!landingData) {
+  throw new Error("Landing content not found");
+}
+
+const data = landingData.data;
+---
+
+<Layout
+  title="About | Mesoscopio"
+  description="Learn about Mesoscopio and our fundraising goals"
+  lang="es"
+  showLangSelector={true}
+>
+  <main class="grow">
+    <AboutSection
+      title_en="About the Project"
+      title_es="Sobre el Proyecto"
+      content_en="Mesoscopio is an advanced 3D capture system designed to create high-fidelity digital replicas of physical objects. Using specialized lighting, precision hardware, and computational photography techniques, we transform real objects into detailed 3D models."
+      content_es="Mesoscopio es un sistema avanzado de captura 3D diseñado para crear réplicas digitales de alta fidelidad de objetos físicos. Utilizando iluminación especializada, hardware de precisión y técnicas de fotografía computacional, transformamos objetos reales en modelos 3D detallados."
+    />
+
+    <FundraisingSection
+      goal_en={data.fundraising_goal_en}
+      goal_es={data.fundraising_goal_es}
+    />
+  </main>
+</Layout>
