@@ -326,7 +326,7 @@ export default function Sandbox({ modelsJSON }) {
             setSelectedInstanceId(null);
           }
         }}
-        className={`absolute top-4 right-4 z-20 p-3 rounded-lg transition-colors ${
+        className={`absolute bottom-4 right-4 z-20 p-3 rounded-lg transition-colors ${
           isEditMode
             ? 'bg-clay-500 text-white hover:bg-clay-600'
             : 'bg-earth-200 text-earth-900 hover:bg-earth-300 dark:bg-earth-700 dark:text-earth-50 dark:hover:bg-earth-600'
