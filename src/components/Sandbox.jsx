@@ -307,7 +307,7 @@ export default function Sandbox({ modelsJSON }) {
       }`}>
         <div className="p-4">
           <h2 className="text-lg font-bold text-earth-900 dark:text-earth-50 mb-4">Models</h2>
-          <div className="space-y-3">
+          <div className="space-y-3 pb-16">
             {models.map((model) => (
               <SidebarModelCard
                 key={model.id}
