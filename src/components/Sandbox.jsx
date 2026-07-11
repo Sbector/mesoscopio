@@ -29,6 +29,13 @@ function SceneModel({
   if (scene && !clonedSceneRef.current) {
     const clone = scene.clone(true);
     
+    // Clone materials so each instance has independent materials
+    clone.traverse((child) => {
+      if (child.isMesh && child.material) {
+        child.material = child.material.clone();
+      }
+    });
+    
     // Center the geometry at the local origin (0,0,0)
     const box = new Box3().setFromObject(clone);
     const center = new Vector3();
