@@ -22,6 +22,8 @@ function SceneModel({
   const groupRef = useRef(null);
   const clonedSceneRef = useRef(null);
   const { scene } = useGLTF(url);
+  const [isFlashing, setIsFlashing] = useState(false);
+  const flashTimeoutRef = useRef(null);
 
   // Clone and center the scene atomically on first load (using ref guard)
   if (scene && !clonedSceneRef.current) {
@@ -43,20 +45,36 @@ function SceneModel({
     return () => onUnregisterRef(instanceId);
   }, [instanceId, onRegisterRef, onUnregisterRef]);
 
-  // Highlight when selected
+  // Highlight flash on click
   useEffect(() => {
     if (groupRef.current && clonedSceneRef.current) {
       clonedSceneRef.current.traverse((child) => {
         if (child.isMesh) {
-          child.material.emissive.setHex(isSelected ? 0x333333 : 0x000000);
-          child.material.emissiveIntensity = isSelected ? 0.3 : 0;
+          child.material.emissive.setHex(isFlashing ? 0xFFAA00 : 0x000000);
+          child.material.emissiveIntensity = isFlashing ? 0.8 : 0;
         }
       });
     }
-  }, [isSelected]);
+  }, [isFlashing]);
+
+  const handleClick = () => {
+    if (!isEditMode) return;
+    
+    // Trigger flash
+    if (flashTimeoutRef.current) {
+      clearTimeout(flashTimeoutRef.current);
+    }
+    setIsFlashing(true);
+    flashTimeoutRef.current = setTimeout(() => {
+      setIsFlashing(false);
+    }, 300);
+    
+    // Call parent select handler
+    onSelect(instanceId);
+  };
 
   return (
-    <group ref={groupRef} onClick={() => isEditMode && onSelect(instanceId)}>
+    <group ref={groupRef} onClick={handleClick}>
       {clonedSceneRef.current && <primitive object={clonedSceneRef.current} />}
     </group>
   );
@@ -216,7 +234,7 @@ export default function Sandbox({ modelsJSON }) {
     if (!selectedInstanceId || !isEditMode) return;
     
     const handleKeyDown = (e) => {
-      if (e.key === 't' || e.key === 'T') {
+      if (e.key === 'm' || e.key === 'M') {
         e.preventDefault();
         setTransformMode('translate');
       } else if (e.key === 'r' || e.key === 'R') {
@@ -245,7 +263,7 @@ export default function Sandbox({ modelsJSON }) {
   return (
     <div className="relative w-full h-full">
       {/* Canvas */}
-      <Canvas camera={{ position: [0, 0, 5], fov: 50 }}>
+      <Canvas camera={{ position: [0, 0, 1.0], fov: 50 }}>
         <color attach="background" args={['#F9FAFB']} />
         <ambientLight intensity={0.6} />
         <directionalLight position={[5, 5, 5]} intensity={1} />
@@ -326,7 +344,7 @@ export default function Sandbox({ modelsJSON }) {
             setSelectedInstanceId(null);
           }
         }}
-        className={`absolute bottom-4 right-4 z-20 p-3 rounded-lg transition-colors ${
+        className={`absolute top-4 left-72 z-40 p-3 rounded-lg transition-colors ${
           isEditMode
             ? 'bg-clay-500 text-white hover:bg-clay-600'
             : 'bg-earth-200 text-earth-900 hover:bg-earth-300 dark:bg-earth-700 dark:text-earth-50 dark:hover:bg-earth-600'
@@ -355,9 +373,12 @@ export default function Sandbox({ modelsJSON }) {
                   ? 'bg-clay-500 text-white'
                   : 'bg-earth-100 text-earth-900 hover:bg-earth-200 dark:bg-earth-800 dark:text-earth-50 dark:hover:bg-earth-700'
               }`}
-              title="Translate (T)"
+              title="Move (M)"
             >
-              T
+              {/* 4-way move arrows */}
+              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M5 9l-3 3 3 3M9 5l3-3 3 3M15 19l-3 3-3-3M19 9l3 3-3 3M12 6v12M6 12h12" />
+              </svg>
             </button>
             <button
               onClick={() => setTransformMode('rotate')}
@@ -368,7 +389,11 @@ export default function Sandbox({ modelsJSON }) {
               }`}
               title="Rotate (R)"
             >
-              R
+              {/* Circular rotation arrow */}
+              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 12a9 9 0 1 1-2.6-6.36" />
+                <path d="M21 3v4.5h-4.5" />
+              </svg>
             </button>
             <button
               onClick={() => setTransformMode('scale')}
@@ -379,7 +404,10 @@ export default function Sandbox({ modelsJSON }) {
               }`}
               title="Scale (S)"
             >
-              S
+              {/* Diagonal expand arrows */}
+              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" />
+              </svg>
             </button>
           </div>
           <button

@@ -10,6 +10,7 @@ interface Props {
   backLabel?: string
   showLangSelector?: boolean
   currentLang?: 'en' | 'es'
+  fullscreen?: boolean
 }
 
 const {
@@ -20,11 +21,12 @@ const {
   backLabel,
   showLangSelector = false,
   currentLang = 'en',
+  fullscreen = false,
 } = Astro.props
 ---
 
 <!doctype html>
-<html lang={lang} data-lang="es">
+<html lang={lang} data-lang="es" class:list={[fullscreen && 'h-dvh overflow-hidden']}>
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -40,14 +42,14 @@ const {
 			document.documentElement.dataset.lang = new URLSearchParams(location.search).get('lang') || 'es'
 		</script>
 	</head>
-	<body class="antialiased">
+	<body class:list={['antialiased', fullscreen && 'h-dvh overflow-hidden']}>
 		<NavBar
 			backUrl={backUrl}
 			backLabel={backLabel}
 			showLangSelector={showLangSelector}
 			currentLang={currentLang}
 		/>
-		<div class="min-h-screen flex flex-col">
+		<div class:list={['flex flex-col', fullscreen ? 'h-full overflow-hidden' : 'min-h-screen']}>
 			<slot />
 		</div>
 	</body>
