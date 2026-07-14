@@ -11,7 +11,7 @@ const { title, description, preview, video, href } = Astro.props
 ---
 
 <a href={href} class="group block h-full" data-scrub-link>
-  <figure class="scrub-card relative w-full aspect-square overflow-hidden rounded-lg border border-earth-200 dark:border-earth-700 bg-earth-100 dark:bg-earth-700 hover:border-clay-400 dark:hover:border-clay-400 transition-all duration-300" data-scrub-card style="touch-action: none;">
+  <figure class="scrub-card relative w-full aspect-square overflow-hidden rounded-lg border border-earth-200 dark:border-earth-700 bg-earth-100 dark:bg-earth-700 hover:border-clay-400 dark:hover:border-clay-400 transition-all duration-300" data-scrub-card style="touch-action: pan-y;">
     <!-- Video: always visible if available, with scrub interaction -->
     {video ? (
       <video
@@ -74,9 +74,11 @@ const { title, description, preview, video, href } = Astro.props
           let isScrubbing = false;
           let hasDragged = false;
           let dragStartX = 0;
+          let dragStartY = 0;
           let pendingRatio: number | null = null;
           let rafId: number | null = null;
           let cachedRect: DOMRect | null = null;
+          let capturedPointerId: number | null = null;
           const dragThreshold = 8; // px
 
           // Initialize video: always paused at frame 0
@@ -99,16 +101,16 @@ const { title, description, preview, video, href } = Astro.props
             }
           });
 
-          // Touch/pen start: record position for drag detection + capture pointer
+          // Touch/pen start: record position for drag detection (no capture yet)
           card.addEventListener('pointerdown', (e) => {
             const evt = e as PointerEvent;
             if (evt.pointerType !== 'touch' && evt.pointerType !== 'pen') return;
             if (prefersReduced) return;
             
             dragStartX = evt.clientX;
+            dragStartY = evt.clientY;
             hasDragged = false;
             cachedRect = card.getBoundingClientRect();
-            card.setPointerCapture(evt.pointerId);
           });
 
           // Move: scrub on mouse/drag, or show overlay on touch drag
@@ -124,14 +126,25 @@ const { title, description, preview, video, href } = Astro.props
             }
             
             // Touch/pen drag detection and scrub
-            if ((evt.pointerType === 'touch' || evt.pointerType === 'pen') && dragStartX !== undefined) {
-              const dragDelta = Math.abs(evt.clientX - dragStartX);
+            if ((evt.pointerType === 'touch' || evt.pointerType === 'pen') && cachedRect) {
+              const deltaX = Math.abs(evt.clientX - dragStartX);
+              const deltaY = Math.abs(evt.clientY - dragStartY);
               
-              if (dragDelta > dragThreshold) {
+              // Vertical drag: let browser handle scroll natively
+              if (deltaY > deltaX && deltaY > dragThreshold) {
+                return;
+              }
+              
+              // Horizontal drag confirmed: capture pointer and scrub
+              if (deltaX > dragThreshold && !hasDragged) {
                 hasDragged = true;
+                capturedPointerId = evt.pointerId;
+                card.setPointerCapture(evt.pointerId);
                 card.classList.add('is-scrubbing');
-                
-                // Queue seek via RAF for smooth scrubbing
+              }
+              
+              // Scrub while dragging
+              if (hasDragged) {
                 const ratio = Math.max(0, Math.min(1, x / rect.width));
                 pendingRatio = ratio;
                 
@@ -143,9 +156,14 @@ const { title, description, preview, video, href } = Astro.props
           });
 
           // End scrub mode or reset state
-          card.addEventListener('pointerleave', () => {
+          card.addEventListener('pointerleave', (e) => {
+            const evt = e as PointerEvent;
             isScrubbing = false;
             card.classList.remove('is-scrubbing');
+            if (capturedPointerId !== null && card.hasPointerCapture(capturedPointerId)) {
+              card.releasePointerCapture(capturedPointerId);
+            }
+            capturedPointerId = null;
             if (rafId !== null) {
               cancelAnimationFrame(rafId);
               rafId = null;
@@ -156,8 +174,13 @@ const { title, description, preview, video, href } = Astro.props
             hasDragged = false;
           });
 
-          card.addEventListener('pointerup', () => {
+          card.addEventListener('pointerup', (e) => {
+            const evt = e as PointerEvent;
             card.classList.remove('is-scrubbing');
+            if (capturedPointerId !== null && card.hasPointerCapture(capturedPointerId)) {
+              card.releasePointerCapture(capturedPointerId);
+            }
+            capturedPointerId = null;
             if (rafId !== null) {
               cancelAnimationFrame(rafId);
               rafId = null;
@@ -171,6 +194,10 @@ const { title, description, preview, video, href } = Astro.props
           // Handle pointercancel (iOS/iPadOS system interruption)
           card.addEventListener('pointercancel', () => {
             card.classList.remove('is-scrubbing');
+            if (capturedPointerId !== null && card.hasPointerCapture(capturedPointerId)) {
+              card.releasePointerCapture(capturedPointerId);
+            }
+            capturedPointerId = null;
             if (rafId !== null) {
               cancelAnimationFrame(rafId);
               rafId = null;
