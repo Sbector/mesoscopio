@@ -203,14 +203,17 @@ export default function Sandbox({ modelsJSON }) {
 
   const groupRefsMap = useRef(new Map());
   const orbitRef = useRef(null);
+  const [refsVersion, setRefsVersion] = useState(0);
 
   // Stable ref handlers with useCallback
   const handleRegisterRef = useCallback((instanceId, ref) => {
     groupRefsMap.current.set(instanceId, ref);
+    setRefsVersion(v => v + 1);
   }, []);
 
   const handleUnregisterRef = useCallback((instanceId) => {
     groupRefsMap.current.delete(instanceId);
+    setRefsVersion(v => v + 1);
   }, []);
 
   // Add model to scene
@@ -292,7 +295,7 @@ export default function Sandbox({ modelsJSON }) {
           <Environment preset="studio" environmentIntensity={0.3} />
         </Suspense>
 
-        {isEditMode && selectedInstanceId && groupRefsMap.current.has(selectedInstanceId) && (
+        {isEditMode && selectedInstanceId && groupRefsMap.current.get(selectedInstanceId) && (
           <EditorTransformControls
             object={groupRefsMap.current.get(selectedInstanceId)}
             mode={transformMode}
