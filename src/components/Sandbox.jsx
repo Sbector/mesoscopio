@@ -279,7 +279,11 @@ export default function Sandbox({ modelsJSON }) {
         <directionalLight position={[5, 5, 5]} intensity={1} />
 
         <Suspense fallback={null}>
-          {sceneModels.map((model) => (
+          <Environment preset="studio" environmentIntensity={0.3} />
+        </Suspense>
+
+        {sceneModels.map((model) => (
+          <Suspense key={model.instanceId} fallback={null}>
             <SceneModel
               key={model.instanceId}
               instanceId={model.instanceId}
@@ -291,9 +295,8 @@ export default function Sandbox({ modelsJSON }) {
               onRegisterRef={handleRegisterRef}
               onUnregisterRef={handleUnregisterRef}
             />
-          ))}
-          <Environment preset="studio" environmentIntensity={0.3} />
-        </Suspense>
+          </Suspense>
+        ))}
 
         {isEditMode && selectedInstanceId && groupRefsMap.current.get(selectedInstanceId) && (
           <EditorTransformControls
