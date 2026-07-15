@@ -377,65 +377,78 @@ export default function Sandbox({ modelsJSON }) {
 
       {/* Transform Toolbar - Only visible in edit mode */}
       {isEditMode && selectedInstanceId && (
-        <div className="absolute top-4 right-4 z-20 bg-white dark:bg-earth-900 rounded-lg shadow-lg p-4 flex flex-col gap-3">
-          <div className="flex gap-2">
-            <button
-              onClick={() => setTransformMode('translate')}
-              className={`px-3 py-2 rounded text-sm font-medium transition-colors ${
-                transformMode === 'translate'
-                  ? 'bg-clay-500 text-white'
-                  : 'bg-earth-100 text-earth-900 hover:bg-earth-200 dark:bg-earth-800 dark:text-earth-50 dark:hover:bg-earth-700'
-              }`}
-              title="Move (M)"
-            >
-              {/* 4-way move arrows */}
-              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M5 9l-3 3 3 3M9 5l3-3 3 3M15 19l-3 3-3-3M19 9l3 3-3 3M12 6v12M6 12h12" />
-              </svg>
-            </button>
-            <button
-              onClick={() => setTransformMode('rotate')}
-              className={`px-3 py-2 rounded text-sm font-medium transition-colors ${
-                transformMode === 'rotate'
-                  ? 'bg-clay-500 text-white'
-                  : 'bg-earth-100 text-earth-900 hover:bg-earth-200 dark:bg-earth-800 dark:text-earth-50 dark:hover:bg-earth-700'
-              }`}
-              title="Rotate (R)"
-            >
-              {/* Circular rotation arrow */}
-              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M21 12a9 9 0 1 1-2.6-6.36" />
-                <path d="M21 3v4.5h-4.5" />
-              </svg>
-            </button>
-            <button
-              onClick={() => setTransformMode('scale')}
-              className={`px-3 py-2 rounded text-sm font-medium transition-colors ${
-                transformMode === 'scale'
-                  ? 'bg-clay-500 text-white'
-                  : 'bg-earth-100 text-earth-900 hover:bg-earth-200 dark:bg-earth-800 dark:text-earth-50 dark:hover:bg-earth-700'
-              }`}
-              title="Scale (S)"
-            >
-              {/* Diagonal expand arrows */}
-              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" />
-              </svg>
-            </button>
-          </div>
+        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 bg-white dark:bg-earth-900 rounded-lg shadow-lg p-2 flex flex-row items-center gap-2">
+          <button
+            onClick={() => setTransformMode('translate')}
+            aria-label="Move (M)"
+            className={`p-2 rounded transition-colors ${
+              transformMode === 'translate'
+                ? 'bg-clay-500 text-white'
+                : 'bg-earth-100 text-earth-900 hover:bg-earth-200 dark:bg-earth-800 dark:text-earth-50 dark:hover:bg-earth-700'
+            }`}
+            title="Move (M)"
+          >
+            {/* 4-way move arrows */}
+            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M5 9l-3 3 3 3M9 5l3-3 3 3M15 19l-3 3-3-3M19 9l3 3-3 3M12 6v12M6 12h12" />
+            </svg>
+          </button>
+          <button
+            onClick={() => setTransformMode('rotate')}
+            aria-label="Rotate (R)"
+            className={`p-2 rounded transition-colors ${
+              transformMode === 'rotate'
+                ? 'bg-clay-500 text-white'
+                : 'bg-earth-100 text-earth-900 hover:bg-earth-200 dark:bg-earth-800 dark:text-earth-50 dark:hover:bg-earth-700'
+            }`}
+            title="Rotate (R)"
+          >
+            {/* Circular rotation arrow */}
+            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M21 12a9 9 0 1 1-2.6-6.36" />
+              <path d="M21 3v4.5h-4.5" />
+            </svg>
+          </button>
+          <button
+            onClick={() => setTransformMode('scale')}
+            aria-label="Scale (S)"
+            className={`p-2 rounded transition-colors ${
+              transformMode === 'scale'
+                ? 'bg-clay-500 text-white'
+                : 'bg-earth-100 text-earth-900 hover:bg-earth-200 dark:bg-earth-800 dark:text-earth-50 dark:hover:bg-earth-700'
+            }`}
+            title="Scale (S)"
+          >
+            {/* Diagonal expand arrows */}
+            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" />
+            </svg>
+          </button>
+
+          <span className="mx-1 h-6 w-px bg-earth-200 dark:bg-earth-700" />
+
           <button
             onClick={handleReset}
-            className="px-3 py-2 rounded text-sm font-medium bg-earth-100 text-earth-900 hover:bg-earth-200 dark:bg-earth-800 dark:text-earth-50 dark:hover:bg-earth-700 transition-colors"
+            aria-label="Reset to original transform"
+            className="p-2 rounded bg-earth-100 text-earth-900 hover:bg-earth-200 dark:bg-earth-800 dark:text-earth-50 dark:hover:bg-earth-700 transition-colors"
             title="Reset to original transform"
           >
-            Reset
+            {/* Refresh / reset arrow */}
+            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M3 12a9 9 0 1 0 2.5-6.7" />
+              <path d="M3 4v4h4" />
+            </svg>
           </button>
           <button
             onClick={() => removeModel(selectedInstanceId)}
-            className="px-3 py-2 rounded text-sm font-medium bg-red-100 text-red-900 hover:bg-red-200 dark:bg-red-900/30 dark:text-red-300 dark:hover:bg-red-900/50 transition-colors"
+            aria-label="Remove from scene"
+            className="p-2 rounded bg-red-100 text-red-900 hover:bg-red-200 dark:bg-red-900/30 dark:text-red-300 dark:hover:bg-red-900/50 transition-colors"
             title="Remove from scene"
           >
-            Remove
+            {/* Trash icon */}
+            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6M10 11v6M14 11v6" />
+            </svg>
           </button>
         </div>
       )}
