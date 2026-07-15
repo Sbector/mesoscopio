@@ -20,6 +20,7 @@ fundraising_goal_es: Mi objetivo es recaudar fondos para una Nikon D610 de
   a una Raspberry Pi para el control.
 cta_text_en: Support the Project
 cta_text_es: Apoya el Proyecto
+cta_url: /
 footer_text_en: Contact
 footer_text_es: Contacto
 ---
