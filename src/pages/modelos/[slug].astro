@@ -17,23 +17,109 @@ const { title, description, model } = item.data;
 ---
 
 <Layout title={`${title} | Mesoscopio`}>
-    <main class="grow h-full flex flex-col p-6 sm:p-10">
-        <div class="max-w-4xl w-full mx-auto flex flex-col flex-1 min-h-0">
-            <div class="mb-4">
-                <h1 class="text-4xl font-bold text-earth-900 dark:text-earth-50 mb-2">{title}</h1>
-                {description && (
-                    <p class="text-lg text-earth-600 dark:text-earth-300">
-                        {description}
-                    </p>
+    <main class="grow h-full relative">
+
+        <!-- ── MOBILE: 3D viewer fullscreen + floating panel ── -->
+        <div class="lg:hidden absolute inset-0 bg-earth-100 dark:bg-earth-800">
+            {model && <ModelViewer client:visible model={model} />}
+
+            <!-- Floating collapsible info panel -->
+            <div class="absolute bottom-4 left-4 right-4 z-10" data-info-panel>
+                <!-- Toggle button (always visible) -->
+                <button
+                    data-panel-toggle
+                    class="w-full bg-white/80 backdrop-blur-sm rounded-xl shadow-lg p-3 text-left flex items-center justify-between active:scale-[0.98] transition-transform"
+                    aria-expanded="true"
+                    aria-controls="panel-content"
+                >
+                    <span class="font-bold text-earth-900 text-sm">{title}</span>
+                    <svg
+                        data-panel-icon
+                        class="w-5 h-5 text-earth-600 transition-transform duration-300"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        viewBox="0 0 24 24"
+                    >
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                    </svg>
+                </button>
+
+                <!-- Collapsible content (expanded by default) -->
+                <div
+                    id="panel-content"
+                    data-panel-content
+                    class="bg-white/80 backdrop-blur-sm rounded-b-xl shadow-lg overflow-hidden transition-all duration-300"
+                    style="max-height: 40vh; opacity: 1; margin-top: 1px;"
+                >
+                    <div class="p-4 max-h-[36vh] overflow-y-auto">
+                        {description && (
+                            <p class="text-sm text-earth-700 leading-relaxed">{description}</p>
+                        )}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── DESKTOP: original layout (lg+) ── -->
+        <div class="hidden lg:flex lg:flex-col lg:h-full p-6 sm:p-10">
+            <div class="max-w-4xl w-full mx-auto flex flex-col flex-1 min-h-0">
+                <div class="mb-4">
+                    <h1 class="text-4xl font-bold text-earth-900 dark:text-earth-50 mb-2">{title}</h1>
+                    {description && (
+                        <p class="text-lg text-earth-600 dark:text-earth-300">
+                            {description}
+                        </p>
+                    )}
+                </div>
+
+                {/* 3D Model Viewer */}
+                {model && (
+                    <div class="flex-1 min-h-0 bg-earth-100 dark:bg-earth-800 rounded-lg overflow-hidden">
+                        <ModelViewer client:visible model={model} />
+                    </div>
                 )}
             </div>
-
-            {/* 3D Model Viewer */}
-            {model && (
-                <div class="flex-1 min-h-[55vh] sm:min-h-0 bg-earth-100 dark:bg-earth-800 rounded-lg overflow-hidden">
-                    <ModelViewer client:visible model={model} />
-                </div>
-            )}
         </div>
     </main>
+
+    <script>
+        function initPanels() {
+            document.querySelectorAll<HTMLElement>('[data-panel-toggle]').forEach((btn) => {
+                btn.addEventListener('click', () => {
+                    const panel = btn.closest<HTMLElement>('[data-info-panel]');
+                    if (!panel) return;
+                    const content = panel.querySelector<HTMLElement>('[data-panel-content]');
+                    const icon = panel.querySelector<HTMLElement>('[data-panel-icon]');
+                    if (!content || !icon) return;
+
+                    const isOpen = content.style.maxHeight !== '0px';
+
+                    if (isOpen) {
+                        // Collapse
+                        content.style.maxHeight = '0px';
+                        content.style.opacity = '0';
+                        content.style.marginTop = '0';
+                        icon.style.transform = 'rotate(0deg)';
+                        btn.setAttribute('aria-expanded', 'false');
+                    } else {
+                        // Expand
+                        content.style.maxHeight = '40vh';
+                        content.style.opacity = '1';
+                        content.style.marginTop = '1px';
+                        icon.style.transform = 'rotate(180deg)';
+                        btn.setAttribute('aria-expanded', 'true');
+                    }
+                });
+            });
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initPanels);
+        } else {
+            initPanels();
+        }
+
+        document.addEventListener('astro:before-preparation', initPanels);
+    </script>
 </Layout>

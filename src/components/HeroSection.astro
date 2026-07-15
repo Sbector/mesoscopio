@@ -13,8 +13,62 @@ const { models, descEn, descEs } = Astro.props;
 const heroModels = models.filter((m) => m.data.video);
 ---
 
-<section class="w-full min-h-full py-6 px-4 sm:px-6 lg:px-8 bg-earth-50 dark:bg-earth-900 flex items-center">
-  <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center gap-12">
+<!-- ============================================================
+     MOBILE (< lg): fullscreen video bg + floating text card
+     DESKTOP (lg+):  original flex-row layout
+     ============================================================ -->
+<section class="h-full lg:h-auto lg:min-h-full lg:py-6 px-0 lg:px-4 sm:px-6 lg:px-8 bg-earth-50 dark:bg-earth-900 flex items-center relative overflow-hidden">
+
+  <!-- ── MOBILE: video fullscreen background ── -->
+  <div class="hero-stage hero-stage-lg lg:hidden absolute inset-0 w-full h-full bg-earth-900 cursor-pointer select-none" role="button" tabindex="0" aria-label="Play or pause hero video">
+    {heroModels.map((model, i) => (
+      <video
+        class:list={[
+          "hero-video absolute inset-0 w-full h-full object-cover",
+          i === 0 ? "is-active" : "",
+        ]}
+        data-hero-video={i}
+        src={model.data.video}
+        muted
+        playsinline
+        loop
+        preload="auto"
+      />
+    ))}
+
+    <!-- Dots indicator (mobile) -->
+    <div class="absolute bottom-28 left-0 right-0 flex items-center justify-center gap-2 z-10">
+      {heroModels.map((_, i) => (
+        <span
+          class:list={[
+            "hero-dot w-2.5 h-2.5 rounded-full border border-white/60 transition-colors duration-300",
+            i === 0
+              ? "bg-white border-white"
+              : "bg-transparent",
+          ]}
+          data-hero-dot={i}
+        />
+      ))}
+    </div>
+  </div>
+
+  <!-- ── MOBILE: floating text card ── -->
+  <div class="hero-card-lg lg:hidden absolute bottom-4 left-4 right-4 z-10 bg-white/80 backdrop-blur-sm rounded-xl shadow-lg p-6">
+    <h1 class="text-2xl font-bold text-earth-900 mb-2">
+      Mesoscopio
+    </h1>
+    <p class="text-earth-700 text-sm leading-relaxed mb-4">
+      <span data-i18n="en">{descEn}</span>
+      <span data-i18n="es">{descEs}</span>
+    </p>
+    <a href="/modelos" class="btn-primary inline-block py-3 px-6 text-sm w-full text-center">
+      <span data-i18n="en">Explore collection</span>
+      <span data-i18n="es">Explorar colección</span>
+    </a>
+  </div>
+
+  <!-- ── DESKTOP: original layout (lg+) ── -->
+  <div class="hidden lg:flex max-w-6xl mx-auto flex-row items-center gap-12">
 
     <!-- Left: square video stage -->
     <div class="hero-stage relative w-full max-w-md aspect-square bg-earth-100 dark:bg-earth-700 rounded-lg overflow-hidden border border-earth-200 dark:border-earth-700 mx-auto sm:mx-0 cursor-pointer select-none" role="button" tabindex="0" aria-label="Play or pause hero video">
@@ -24,10 +78,11 @@ const heroModels = models.filter((m) => m.data.video);
             "hero-video absolute inset-0 w-full h-full object-contain",
             i === 0 ? "is-active" : "",
           ]}
-          data-hero-video={i}
+          data-hero-video-desktop={i}
           src={model.data.video}
           muted
           playsinline
+          loop
           preload="auto"
         />
       ))}
@@ -42,22 +97,22 @@ const heroModels = models.filter((m) => m.data.video);
                 ? "bg-clay-500 border-clay-500"
                 : "bg-transparent",
             ]}
-            data-hero-dot={i}
+            data-hero-dot-desktop={i}
           />
         ))}
       </div>
     </div>
 
     <!-- Right: text + CTA -->
-    <div class="flex-1 text-center sm:text-left">
-      <h1 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-earth-900 dark:text-earth-50 mb-4">
+    <div class="flex-1 text-left">
+      <h1 class="text-5xl font-bold text-earth-900 dark:text-earth-50 mb-4">
         Mesoscopio
       </h1>
-      <p class="text-earth-700 dark:text-earth-300 text-base sm:text-lg leading-relaxed mb-8">
+      <p class="text-earth-700 dark:text-earth-300 text-lg leading-relaxed mb-8">
         <span data-i18n="en">{descEn}</span>
         <span data-i18n="es">{descEs}</span>
       </p>
-      <a href="/modelos" class="btn-primary inline-block py-4 px-8 sm:py-3 sm:px-6 text-base sm:text-sm">
+      <a href="/modelos" class="btn-primary inline-block py-3 px-6 text-sm">
         <span data-i18n="en">Explore collection</span>
         <span data-i18n="es">Explorar colección</span>
       </a>
@@ -79,34 +134,79 @@ const heroModels = models.filter((m) => m.data.video);
   .hero-stage:fullscreen .hero-video {
     object-fit: contain;
   }
+
+  /* ── Landscape layout (mobile only, < lg) ── */
+  @media (max-width: 1023px) and (orientation: landscape) {
+    section {
+      display: flex !important;
+      flex-direction: row !important;
+      align-items: center !important;
+      justify-content: center !important;
+      gap: 1.5rem !important;
+      padding: 0 1rem !important;
+    }
+
+    .hero-stage-lg {
+      position: relative !important;
+      width: 55% !important;
+      height: 80dvh !important;
+      max-height: 400px !important;
+      flex-shrink: 0 !important;
+      border-radius: 0.75rem !important;
+      border: 1px solid rgb(229 231 235) !important;
+    }
+
+    .hero-card-lg {
+      position: relative !important;
+      width: 45% !important;
+      max-width: none !important;
+      bottom: auto !important;
+      left: auto !important;
+      right: auto !important;
+    }
+  }
 </style>
 
 <script>
   function initHeroCarousel() {
-    const videos = Array.from(
+    // Mobile videos
+    const mobileVideos = Array.from(
       document.querySelectorAll<HTMLVideoElement>('[data-hero-video]')
     );
-    const dots = Array.from(
+    const mobileDots = Array.from(
       document.querySelectorAll<HTMLElement>('[data-hero-dot]')
     );
+
+    // Desktop videos
+    const desktopVideos = Array.from(
+      document.querySelectorAll<HTMLVideoElement>('[data-hero-video-desktop]')
+    );
+    const desktopDots = Array.from(
+      document.querySelectorAll<HTMLElement>('[data-hero-dot-desktop]')
+    );
+
+    // Use mobile or desktop based on screen
+    const isMobile = window.innerWidth < 1024;
+    const videos = isMobile ? mobileVideos : desktopVideos;
+    const dots = isMobile ? mobileDots : desktopDots;
+
     if (videos.length === 0) return;
 
     const prefersReduced = window.matchMedia(
       '(prefers-reduced-motion: reduce)'
     ).matches;
 
-    const stage = document.querySelector<HTMLElement>('.hero-stage');
+    const stages = document.querySelectorAll<HTMLElement>('.hero-stage');
+    const stage = isMobile ? stages[0] : stages[1] || stages[0];
 
     let current = 0;
     const INTERVAL = 6000;
     let timer: number | null = null;
     let isHovering = false;
 
-    // Overlap: incoming starts before outgoing fully fades out (no gap → no flicker)
     const TRANSITION = 450;
     let switching = false;
 
-    // Reset a video to frame 0 and pause it
     const resetVideo = (video: HTMLVideoElement | undefined) => {
       if (!video) return;
       video.pause();
@@ -117,20 +217,18 @@ const heroModels = models.filter((m) => m.data.video);
       if (switching || index === current) return;
       switching = true;
 
-      // Fade out current video and reset it
       const outgoing = videos[current];
       outgoing?.classList.remove('is-active');
       resetVideo(outgoing);
-      dots[current]?.classList.remove('bg-clay-500', 'border-clay-500');
-      dots[current]?.classList.add('bg-transparent', 'border-earth-400');
+      dots[current]?.classList.remove(isMobile ? 'bg-white' : 'bg-clay-500', isMobile ? 'border-white' : 'border-clay-500');
+      dots[current]?.classList.add('bg-transparent', isMobile ? 'border-white/60' : 'border-earth-400');
 
-      // After exit transition starts, fade in the next video (overlapping)
       window.setTimeout(() => {
         outgoing?.classList.remove('is-active');
         current = index;
         videos[current]?.classList.add('is-active');
-        dots[current]?.classList.add('bg-clay-500', 'border-clay-500');
-        dots[current]?.classList.remove('bg-transparent', 'border-earth-400');
+        dots[current]?.classList.add(isMobile ? 'bg-white' : 'bg-clay-500', isMobile ? 'border-white' : 'border-clay-500');
+        dots[current]?.classList.remove('bg-transparent', isMobile ? 'border-white/60' : 'border-earth-400');
         switching = false;
       }, TRANSITION);
     };
@@ -158,7 +256,7 @@ const heroModels = models.filter((m) => m.data.video);
       if (prefersReduced) return;
       isHovering = true;
       isScrubbing = true;
-      stop(); // pause auto-cycling while hovering
+      stop();
     };
 
     const moveScrub = (clientX: number) => {
@@ -175,7 +273,7 @@ const heroModels = models.filter((m) => m.data.video);
       isHovering = false;
       isScrubbing = false;
       resetVideo(videos[current]);
-      start(); // resume auto-cycling
+      start();
     };
 
     if (stage) {
@@ -191,7 +289,7 @@ const heroModels = models.filter((m) => m.data.video);
         if (evt.pointerType === 'mouse') endScrub();
       });
 
-      // Tap to play/pause (touch + keyboard) — mobile friendly
+      // Tap to play/pause (touch + keyboard)
       const togglePlay = () => {
         if (prefersReduced) return;
         const video = videos[current];

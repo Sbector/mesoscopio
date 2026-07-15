@@ -2,11 +2,12 @@ import { Canvas } from "@react-three/fiber";
 import {
   OrbitControls,
   useGLTF,
-  Environment,
   TransformControls,
+  Environment,
 } from "@react-three/drei";
 import { Suspense, useState, useRef, useEffect, useLayoutEffect, useCallback } from "react";
 import { Box3, Vector3 } from "three";
+import GridHelper from "@/components/three/GridHelper.jsx";
 
 // ---------- SCENE MODEL ----------
 function SceneModel({ 
@@ -200,6 +201,8 @@ export default function Sandbox({ modelsJSON }) {
   const [transformMode, setTransformMode] = useState('translate');
   const [isPanelOpen, setIsPanelOpen] = useState(true);
   const [isEditMode, setIsEditMode] = useState(true);
+  const [showGrid, setShowGrid] = useState(false);
+  const [envIntensity, setEnvIntensity] = useState(0.3);
 
   const groupRefsMap = useRef(new Map());
   const orbitRef = useRef(null);
@@ -274,13 +277,12 @@ export default function Sandbox({ modelsJSON }) {
     <div className="relative w-full h-full">
       {/* Canvas */}
       <Canvas camera={{ position: [0, 0, 1.0], fov: 50 }}>
-        <color attach="background" args={['#F9FAFB']} />
+        <color attach="background" args={['#ffffff']} />
         <ambientLight intensity={0.6} />
-        <directionalLight position={[5, 5, 5]} intensity={1} />
+        <directionalLight position={[5, 5, 5]} intensity={0.8} />
+        <Environment preset="studio" environmentIntensity={envIntensity} />
 
-        <Suspense fallback={null}>
-          <Environment preset="studio" environmentIntensity={0.3} />
-        </Suspense>
+        {showGrid && <GridHelper />}
 
         {sceneModels.map((model) => (
           <Suspense key={model.instanceId} fallback={null}>
@@ -357,23 +359,63 @@ export default function Sandbox({ modelsJSON }) {
             setSelectedInstanceId(null);
           }
         }}
-        className={`absolute top-4 left-72 z-40 p-3 rounded-lg transition-colors ${
+        className={`absolute top-4 left-72 z-40 p-3 rounded-lg transition-colors border ${
           isEditMode
-            ? 'bg-clay-500 text-white hover:bg-clay-600'
-            : 'bg-earth-200 text-earth-900 hover:bg-earth-300 dark:bg-earth-700 dark:text-earth-50 dark:hover:bg-earth-600'
+            ? 'border-clay-500 text-clay-600 dark:text-clay-400'
+            : 'border-earth-300 text-earth-600 hover:bg-earth-100 dark:border-earth-600 dark:text-earth-300 dark:hover:bg-earth-800'
         }`}
         title={isEditMode ? 'Exit edit mode (view only)' : 'Enter edit mode'}
       >
-        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+        <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           {isEditMode ? (
             // Pencil icon (edit mode on)
-            <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25z M20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" />
+            <path d="M12 20h9M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z" />
           ) : (
             // Eye icon (view mode on)
-            <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z" />
+            <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z M12 9a3 3 0 1 0 0 6 3 3 0 0 0 0-6Z" />
           )}
         </svg>
       </button>
+
+      {/* Scene controls */}
+      <div className="absolute top-4 right-4 z-20 bg-white dark:bg-earth-900 rounded-lg shadow-lg p-3 flex items-center gap-3">
+        {/* Environment intensity */}
+        <label className="flex items-center gap-2 text-earth-700 dark:text-earth-300" title="Intensidad de iluminación">
+          <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="4" />
+            <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41" />
+          </svg>
+          <input
+            type="range"
+            min="0"
+            max="0.8"
+            step="0.05"
+            value={envIntensity}
+            onChange={(e) => setEnvIntensity(parseFloat(e.target.value))}
+            className="w-20 accent-clay-500 cursor-pointer"
+            aria-label="Intensidad de iluminación"
+          />
+        </label>
+
+        {/* Grid toggle */}
+        <button
+          onClick={() => setShowGrid(!showGrid)}
+          aria-label={showGrid ? "Ocultar grid" : "Mostrar grid"}
+          className={`p-1.5 rounded border transition-colors ${
+            showGrid
+              ? 'border-clay-500 text-clay-600 dark:text-clay-400'
+              : 'border-earth-300 text-earth-600 hover:bg-earth-100 dark:border-earth-600 dark:text-earth-300 dark:hover:bg-earth-800'
+          }`}
+          title={showGrid ? "Ocultar grid" : "Mostrar grid"}
+        >
+          <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <rect x="3" y="3" width="7" height="7" />
+            <rect x="14" y="3" width="7" height="7" />
+            <rect x="14" y="14" width="7" height="7" />
+            <rect x="3" y="14" width="7" height="7" />
+          </svg>
+        </button>
+      </div>
 
       {/* Transform Toolbar - Only visible in edit mode */}
       {isEditMode && selectedInstanceId && (
@@ -381,10 +423,10 @@ export default function Sandbox({ modelsJSON }) {
           <button
             onClick={() => setTransformMode('translate')}
             aria-label="Move (M)"
-            className={`p-2 rounded transition-colors ${
+            className={`p-2 rounded border transition-colors ${
               transformMode === 'translate'
-                ? 'bg-clay-500 text-white'
-                : 'bg-earth-100 text-earth-900 hover:bg-earth-200 dark:bg-earth-800 dark:text-earth-50 dark:hover:bg-earth-700'
+                ? 'border-clay-500 text-clay-600 dark:text-clay-400'
+                : 'border-earth-300 text-earth-600 hover:bg-earth-100 dark:border-earth-600 dark:text-earth-300 dark:hover:bg-earth-800'
             }`}
             title="Move (M)"
           >
@@ -396,15 +438,15 @@ export default function Sandbox({ modelsJSON }) {
           <button
             onClick={() => setTransformMode('rotate')}
             aria-label="Rotate (R)"
-            className={`p-2 rounded transition-colors ${
+            className={`relative w-10 h-10 rounded-full border-2 transition-all ${
               transformMode === 'rotate'
-                ? 'bg-clay-500 text-white'
-                : 'bg-earth-100 text-earth-900 hover:bg-earth-200 dark:bg-earth-800 dark:text-earth-50 dark:hover:bg-earth-700'
+                ? 'border-clay-500 text-clay-600 ring-2 ring-clay-400 scale-105 dark:text-clay-400'
+                : 'border-earth-300 text-earth-600 hover:bg-earth-100 dark:border-earth-600 dark:text-earth-300 dark:hover:bg-earth-800'
             }`}
             title="Rotate (R)"
           >
             {/* Circular rotation arrow */}
-            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <svg className="w-5 h-5 absolute inset-0 m-auto" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M21 12a9 9 0 1 1-2.6-6.36" />
               <path d="M21 3v4.5h-4.5" />
             </svg>
@@ -412,10 +454,10 @@ export default function Sandbox({ modelsJSON }) {
           <button
             onClick={() => setTransformMode('scale')}
             aria-label="Scale (S)"
-            className={`p-2 rounded transition-colors ${
+            className={`p-2 rounded border transition-colors ${
               transformMode === 'scale'
-                ? 'bg-clay-500 text-white'
-                : 'bg-earth-100 text-earth-900 hover:bg-earth-200 dark:bg-earth-800 dark:text-earth-50 dark:hover:bg-earth-700'
+                ? 'border-clay-500 text-clay-600 dark:text-clay-400'
+                : 'border-earth-300 text-earth-600 hover:bg-earth-100 dark:border-earth-600 dark:text-earth-300 dark:hover:bg-earth-800'
             }`}
             title="Scale (S)"
           >
@@ -430,7 +472,7 @@ export default function Sandbox({ modelsJSON }) {
           <button
             onClick={handleReset}
             aria-label="Reset to original transform"
-            className="p-2 rounded bg-earth-100 text-earth-900 hover:bg-earth-200 dark:bg-earth-800 dark:text-earth-50 dark:hover:bg-earth-700 transition-colors"
+            className="p-2 rounded border border-earth-300 text-earth-600 hover:bg-earth-100 dark:border-earth-600 dark:text-earth-300 dark:hover:bg-earth-800 transition-colors"
             title="Reset to original transform"
           >
             {/* Refresh / reset arrow */}
@@ -442,7 +484,7 @@ export default function Sandbox({ modelsJSON }) {
           <button
             onClick={() => removeModel(selectedInstanceId)}
             aria-label="Remove from scene"
-            className="p-2 rounded bg-red-100 text-red-900 hover:bg-red-200 dark:bg-red-900/30 dark:text-red-300 dark:hover:bg-red-900/50 transition-colors"
+            className="p-2 rounded border border-red-400 text-red-600 hover:bg-red-100 dark:border-red-500 dark:text-red-300 dark:hover:bg-red-900/30 transition-colors"
             title="Remove from scene"
           >
             {/* Trash icon */}

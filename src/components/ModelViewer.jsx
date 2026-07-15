@@ -78,31 +78,31 @@ export default function ModelViewer({ model }) {
         />
       </Canvas>
 
-      {/* "View in 3D" button — triggers fullscreen (mobile friendly) */}
+      {/* Auto-rotate toggle button (top-LEFT) */}
+      <button
+        onClick={() => setAutoRotate(!autoRotate)}
+        className="absolute top-4 left-4 z-10 p-3 rounded-xl border border-earth-300 text-earth-600 hover:bg-earth-100 dark:border-earth-600 dark:text-earth-300 dark:hover:bg-earth-800 active:scale-95 transition-all"
+        title={autoRotate ? "Detener rotación" : "Iniciar rotación"}
+      >
+        <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          {autoRotate ? (
+            // Pause icon
+            <path d="M8 5v14M16 5v14" />
+          ) : (
+            // Play icon
+            <path d="M7 5l12 7-12 7z" />
+          )}
+        </svg>
+      </button>
+
+      {/* Fullscreen button — top-RIGHT */}
       <button
         onClick={toggleFullscreen}
-        className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 flex items-center justify-center p-3 rounded-xl bg-clay-500 text-earth-50 hover:bg-clay-600 active:bg-clay-700 transition-colors shadow-lg"
+        className="absolute top-4 right-4 z-10 flex items-center justify-center p-3 rounded-xl border-2 border-clay-500 text-clay-600 hover:bg-clay-100 active:scale-95 transition-all dark:text-clay-400 dark:border-clay-400 dark:hover:bg-clay-900/30"
         title={isFullscreen ? "Salir de pantalla completa" : "Ver en 3D (pantalla completa)"}
       >
         <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" d="M4 8V4h4M16 4h4v4M4 16v4h4m8 0h4v-4" />
-        </svg>
-      </button>
-
-      {/* Auto-rotate toggle button (top-right, larger touch target) */}
-      <button
-        onClick={() => setAutoRotate(!autoRotate)}
-        className="absolute top-4 right-4 z-10 p-3 rounded-xl bg-earth-200 text-earth-900 hover:bg-earth-300 dark:bg-earth-700 dark:text-earth-50 dark:hover:bg-earth-600 active:scale-95 transition-all"
-        title={autoRotate ? "Detener rotación" : "Iniciar rotación"}
-      >
-        <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-          {autoRotate ? (
-            // Pause icon
-            <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z" />
-          ) : (
-            // Play icon
-            <path d="M8 5v14l11-7z" />
-          )}
         </svg>
       </button>
     </div>
