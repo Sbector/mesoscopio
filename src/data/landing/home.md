@@ -1,10 +1,16 @@
 ---
 title_en: Help Bring Mesoscopio to Life
 title_es: Ayuda a Dar Vida a Mesoscopio
-description_en: Mesoscope is a digitization, preservation, and archiving
-  platform for real-world objects.
-description_es: Mesoscopio es una plataforma de digitalización, conservación y
-  archivo de objetos reales.
+description_en: Mesoscopio combines a custom turntable, specialized
+  cross-polarization lighting, and high-precision camera gear to capture objects
+  in 3D. This project isn't just about pictures; it's about creating detailed
+  digital replicas that feel like the real thing. Your support makes this
+  possible.
+description_es: Mesoscopio combina una plataforma giratoria personalizada,
+  iluminación especializada de polarización cruzada y equipos de alta precisión
+  para capturar objetos en 3D. Este proyecto no se trata solo de imágenes; se
+  trata de crear réplicas digitales detalladas que se sienten como el objeto
+  real. Tu apoyo hace esto posible.
 fundraising_goal_en: My goal is to raise funds for a used Nikon D610 to get
   full-frame quality, redesign my lighting system, update the turntable gears,
   and switch to a Raspberry Pi for control.
