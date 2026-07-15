@@ -17,7 +17,7 @@ const heroModels = models.filter((m) => m.data.video);
   <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center gap-12">
 
     <!-- Left: square video stage -->
-    <div class="hero-stage relative w-full max-w-md aspect-square bg-earth-100 dark:bg-earth-700 rounded-lg overflow-hidden border border-earth-200 dark:border-earth-700 mx-auto sm:mx-0">
+    <div class="hero-stage relative w-full max-w-md aspect-square bg-earth-100 dark:bg-earth-700 rounded-lg overflow-hidden border border-earth-200 dark:border-earth-700 mx-auto sm:mx-0 cursor-pointer select-none" role="button" tabindex="0" aria-label="Play or pause hero video">
       {heroModels.map((model, i) => (
         <video
           class:list={[
@@ -50,14 +50,14 @@ const heroModels = models.filter((m) => m.data.video);
 
     <!-- Right: text + CTA -->
     <div class="flex-1 text-center sm:text-left">
-      <h1 class="text-4xl sm:text-5xl font-bold text-earth-900 dark:text-earth-50 mb-4">
+      <h1 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-earth-900 dark:text-earth-50 mb-4">
         Mesoscopio
       </h1>
-      <p class="text-earth-700 dark:text-earth-300 text-lg leading-relaxed mb-8">
+      <p class="text-earth-700 dark:text-earth-300 text-base sm:text-lg leading-relaxed mb-8">
         <span data-i18n="en">{descEn}</span>
         <span data-i18n="es">{descEs}</span>
       </p>
-      <a href="/modelos" class="btn-primary inline-block">
+      <a href="/modelos" class="btn-primary inline-block py-4 px-8 sm:py-3 sm:px-6 text-base sm:text-sm">
         <span data-i18n="en">Explore collection</span>
         <span data-i18n="es">Explorar colección</span>
       </a>
@@ -189,6 +189,32 @@ const heroModels = models.filter((m) => m.data.video);
       stage.addEventListener('pointerleave', (e) => {
         const evt = e as PointerEvent;
         if (evt.pointerType === 'mouse') endScrub();
+      });
+
+      // Tap to play/pause (touch + keyboard) — mobile friendly
+      const togglePlay = () => {
+        if (prefersReduced) return;
+        const video = videos[current];
+        if (!video) return;
+        if (video.paused) {
+          stop();
+          video.play().catch(() => {});
+          stage?.classList.add('is-playing');
+        } else {
+          video.pause();
+          stage?.classList.remove('is-playing');
+          start();
+        }
+      };
+
+      stage.addEventListener('click', (e) => {
+        if ((e as PointerEvent).pointerType === 'touch') togglePlay();
+      });
+      stage.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          togglePlay();
+        }
       });
     }
 

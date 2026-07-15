@@ -78,36 +78,30 @@ export default function ModelViewer({ model }) {
         />
       </Canvas>
 
-      {/* Auto-rotate toggle button */}
+      {/* "View in 3D" button — triggers fullscreen (mobile friendly) */}
+      <button
+        onClick={toggleFullscreen}
+        className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 flex items-center justify-center p-3 rounded-xl bg-clay-500 text-earth-50 hover:bg-clay-600 active:bg-clay-700 transition-colors shadow-lg"
+        title={isFullscreen ? "Salir de pantalla completa" : "Ver en 3D (pantalla completa)"}
+      >
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M4 8V4h4M16 4h4v4M4 16v4h4m8 0h4v-4" />
+        </svg>
+      </button>
+
+      {/* Auto-rotate toggle button (top-right, larger touch target) */}
       <button
         onClick={() => setAutoRotate(!autoRotate)}
-        className="absolute bottom-4 left-4 z-10 p-2 rounded-lg bg-earth-200 text-earth-900 hover:bg-earth-300 dark:bg-earth-700 dark:text-earth-50 dark:hover:bg-earth-600 transition-colors"
+        className="absolute top-4 right-4 z-10 p-3 rounded-xl bg-earth-200 text-earth-900 hover:bg-earth-300 dark:bg-earth-700 dark:text-earth-50 dark:hover:bg-earth-600 active:scale-95 transition-all"
         title={autoRotate ? "Detener rotación" : "Iniciar rotación"}
       >
-        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+        <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
           {autoRotate ? (
             // Pause icon
             <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z" />
           ) : (
             // Play icon
             <path d="M8 5v14l11-7z" />
-          )}
-        </svg>
-      </button>
-
-      {/* Fullscreen toggle button */}
-      <button
-        onClick={toggleFullscreen}
-        className="absolute bottom-4 left-14 z-10 p-2 rounded-lg bg-earth-200 text-earth-900 hover:bg-earth-300 dark:bg-earth-700 dark:text-earth-50 dark:hover:bg-earth-600 transition-colors"
-        title={isFullscreen ? "Salir de pantalla completa" : "Pantalla completa"}
-      >
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-          {isFullscreen ? (
-            // Exit fullscreen icon
-            <path strokeLinecap="round" strokeLinejoin="round" d="M9 9V5H5m0 4h4M15 9h4V5m0 4h-4M9 15H5v4m4 0v-4m6 4v-4h4m0 0h-4" />
-          ) : (
-            // Enter fullscreen icon
-            <path strokeLinecap="round" strokeLinejoin="round" d="M4 8V4h4M16 4h4v4M4 16v4h4m8 0h4v-4" />
           )}
         </svg>
       </button>
