@@ -6,10 +6,6 @@ interface Props {
   title?: string
   description?: string
   lang?: 'en' | 'es'
-  backUrl?: string
-  backLabel?: string
-  showLangSelector?: boolean
-  currentLang?: 'en' | 'es'
   fullscreen?: boolean
 }
 
@@ -17,10 +13,6 @@ const {
   title = 'Mesoscopio',
   description = 'Mesoscopio - Advanced 3D Capture',
   lang = 'en',
-  backUrl,
-  backLabel,
-  showLangSelector = false,
-  currentLang = 'en',
   fullscreen = false,
 } = Astro.props
 ---
@@ -43,12 +35,7 @@ const {
 		</script>
 	</head>
 	<body class:list={['antialiased', fullscreen && 'h-dvh overflow-hidden']}>
-		<NavBar
-			backUrl={backUrl}
-			backLabel={backLabel}
-			showLangSelector={showLangSelector}
-			currentLang={currentLang}
-		/>
+		<NavBar />
 		<div class:list={['flex flex-col', fullscreen ? 'h-full overflow-hidden' : 'min-h-screen']}>
 			<slot />
 		</div>

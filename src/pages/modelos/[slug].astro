@@ -16,11 +16,7 @@ const { item } = Astro.props;
 const { title, description, model } = item.data;
 ---
 
-<Layout
-    title={`${title} | Mesoscopio`}
-    backUrl="/modelos"
-    backLabel="All models"
->
+<Layout title={`${title} | Mesoscopio`}>
     <main class="grow p-6 sm:p-10">
         <div class="max-w-4xl mx-auto space-y-6">
             <div>
@@ -31,15 +27,6 @@ const { title, description, model } = item.data;
                     </p>
                 )}
             </div>
-
-            {/* Back to gallery link */}
-            <a
-                href="/modelos"
-                class="inline-flex items-center gap-2 text-clay-500 hover:text-clay-600 dark:hover:text-clay-400 font-medium text-sm transition-colors"
-            >
-                <span>←</span>
-                <span>Back to gallery</span>
-            </a>
 
             {/* 3D Model Viewer */}
             {model && (

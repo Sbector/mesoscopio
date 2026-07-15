@@ -6,7 +6,7 @@ import { getCollection } from "astro:content";
 const modelos = await getCollection("modelos");
 ---
 
-<Layout backUrl="/" backLabel="Home">
+<Layout lang="es">
 	<main class="grow">
 		<ModelsGrid models={modelos} />
 	</main>
