@@ -39,19 +39,20 @@ const { title, description, preview, video, href } = Astro.props
       )
     )}
 
-    <!-- Text overlay: shown on hover (desktop) or touch (mobile) -->
-    <div class="absolute bottom-0 left-0 right-0 bg-linear-to-b from-transparent to-white/20 opacity-0 group-hover:opacity-100 scrub-overlay transition-opacity duration-300 p-4">
-      <div class="w-full">
-        <h3 class="text-earth-900 dark:text-earth-900 font-semibold text-sm sm:text-base truncate">
-          {title}
-        </h3>
+    <!-- Title: always visible -->
+    <div class="absolute bottom-0 left-0 right-0 bg-linear-to-b from-transparent to-white/40 p-4">
+      <h3 class="text-earth-900 font-semibold text-sm sm:text-base truncate">
+        {title}
+      </h3>
+      <!-- Extra info: revealed on hover / scrub -->
+      <div class="scrub-overlay max-h-0 opacity-0 overflow-hidden group-hover:max-h-32 group-hover:opacity-100 transition-all duration-300">
         {description && (
-          <p class="text-earth-700 dark:text-earth-700 text-xs sm:text-sm line-clamp-2 mt-1">
+          <p class="text-earth-700 text-xs sm:text-sm line-clamp-2 mt-1">
             {description}
           </p>
         )}
         {video && (
-          <p class="text-earth-600 dark:text-earth-600 text-xs mt-2">Drag to rotate →</p>
+          <p class="text-earth-600 text-xs mt-2">Drag to rotate →</p>
         )}
       </div>
     </div>
@@ -232,7 +233,7 @@ const { title, description, preview, video, href } = Astro.props
     
     <style>
       .scrub-card.is-scrubbing .scrub-overlay {
-        @apply opacity-100;
+        @apply opacity-100 max-h-32;
       }
     </style>
   </>
