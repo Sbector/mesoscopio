@@ -1,38 +1,228 @@
 ---
+import type { CollectionEntry } from 'astro:content';
+
 interface Props {
-  title_en: string
-  title_es: string
-  description_en: string
-  description_es: string
-  cta_text_en: string
-  cta_text_es: string
-  ctaUrl?: string
+  models: CollectionEntry<'modelos'>[]
+  descEn: string
+  descEs: string
 }
 
-const { title_en, title_es, description_en, description_es, cta_text_en, cta_text_es, ctaUrl = '#modelos' } = Astro.props
+const { models, descEn, descEs } = Astro.props;
+
+// Only models with video preview
+const heroModels = models.filter((m) => m.data.video);
 ---
 
-<section class="relative w-full py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-earth-50 to-earth-100 dark:from-earth-800 dark:to-earth-900">
-  <div class="max-w-4xl mx-auto text-center space-y-8">
-    <div class="space-y-4">
-      <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight tracking-tight text-earth-900 dark:text-earth-50">
-        <span data-i18n="en">{title_en}</span>
-        <span data-i18n="es">{title_es}</span>
-      </h1>
-      <p class="text-lg sm:text-xl text-earth-600 dark:text-earth-300 leading-relaxed max-w-2xl mx-auto">
-        <span data-i18n="en">{description_en}</span>
-        <span data-i18n="es">{description_es}</span>
-      </p>
+<section class="w-full min-h-full py-6 px-4 sm:px-6 lg:px-8 bg-earth-50 dark:bg-earth-900 flex items-center">
+  <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center gap-12">
+
+    <!-- Left: square video stage -->
+    <div class="hero-stage relative w-full max-w-md aspect-square bg-earth-100 dark:bg-earth-700 rounded-lg overflow-hidden border border-earth-200 dark:border-earth-700 mx-auto sm:mx-0">
+      {heroModels.map((model, i) => (
+        <video
+          class:list={[
+            "hero-video absolute inset-0 w-full h-full object-contain",
+            i === 0 ? "is-active" : "",
+          ]}
+          data-hero-video={i}
+          src={model.data.video}
+          muted
+          playsinline
+          preload="auto"
+        />
+      ))}
+
+      <!-- Dots indicator -->
+      <div class="absolute bottom-3 left-0 right-0 flex items-center justify-center gap-2">
+        {heroModels.map((_, i) => (
+          <span
+            class:list={[
+              "hero-dot w-2.5 h-2.5 rounded-full border border-earth-400 transition-colors duration-300",
+              i === 0
+                ? "bg-clay-500 border-clay-500"
+                : "bg-transparent",
+            ]}
+            data-hero-dot={i}
+          />
+        ))}
+      </div>
     </div>
 
-    <div class="flex gap-4 justify-center">
-      <a
-        href={ctaUrl}
-        class="inline-flex px-8 py-3 bg-clay-500 hover:bg-clay-600 text-earth-50 font-semibold rounded-lg transition-colors duration-200"
-      >
-        <span data-i18n="en">{cta_text_en}</span>
-        <span data-i18n="es">{cta_text_es}</span>
+    <!-- Right: text + CTA -->
+    <div class="flex-1 text-center sm:text-left">
+      <h1 class="text-4xl sm:text-5xl font-bold text-earth-900 dark:text-earth-50 mb-4">
+        Mesoscopio
+      </h1>
+      <p class="text-earth-700 dark:text-earth-300 text-lg leading-relaxed mb-8">
+        <span data-i18n="en">{descEn}</span>
+        <span data-i18n="es">{descEs}</span>
+      </p>
+      <a href="/modelos" class="btn-primary inline-block">
+        <span data-i18n="en">Explore collection</span>
+        <span data-i18n="es">Explorar colección</span>
       </a>
     </div>
+
   </div>
 </section>
+
+<style>
+  .hero-video {
+    opacity: 0;
+    transition: opacity 0.6s ease-in;
+    pointer-events: none;
+  }
+  .hero-video.is-active {
+    opacity: 1;
+    transition: opacity 0.6s ease-out;
+  }
+  .hero-stage:fullscreen .hero-video {
+    object-fit: contain;
+  }
+</style>
+
+<script>
+  function initHeroCarousel() {
+    const videos = Array.from(
+      document.querySelectorAll<HTMLVideoElement>('[data-hero-video]')
+    );
+    const dots = Array.from(
+      document.querySelectorAll<HTMLElement>('[data-hero-dot]')
+    );
+    if (videos.length === 0) return;
+
+    const prefersReduced = window.matchMedia(
+      '(prefers-reduced-motion: reduce)'
+    ).matches;
+
+    const stage = document.querySelector<HTMLElement>('.hero-stage');
+
+    let current = 0;
+    const INTERVAL = 6000;
+    let timer: number | null = null;
+    let isHovering = false;
+
+    // Overlap: incoming starts before outgoing fully fades out (no gap → no flicker)
+    const TRANSITION = 450;
+    let switching = false;
+
+    // Reset a video to frame 0 and pause it
+    const resetVideo = (video: HTMLVideoElement | undefined) => {
+      if (!video) return;
+      video.pause();
+      video.currentTime = 0;
+    };
+
+    const show = (index: number) => {
+      if (switching || index === current) return;
+      switching = true;
+
+      // Fade out current video and reset it
+      const outgoing = videos[current];
+      outgoing?.classList.remove('is-active');
+      resetVideo(outgoing);
+      dots[current]?.classList.remove('bg-clay-500', 'border-clay-500');
+      dots[current]?.classList.add('bg-transparent', 'border-earth-400');
+
+      // After exit transition starts, fade in the next video (overlapping)
+      window.setTimeout(() => {
+        outgoing?.classList.remove('is-active');
+        current = index;
+        videos[current]?.classList.add('is-active');
+        dots[current]?.classList.add('bg-clay-500', 'border-clay-500');
+        dots[current]?.classList.remove('bg-transparent', 'border-earth-400');
+        switching = false;
+      }, TRANSITION);
+    };
+
+    const next = () => show((current + 1) % videos.length);
+
+    const start = () => {
+      if (prefersReduced || isHovering) return;
+      if (timer === null) {
+        timer = window.setInterval(next, INTERVAL);
+      }
+    };
+
+    const stop = () => {
+      if (timer !== null) {
+        clearInterval(timer);
+        timer = null;
+      }
+    };
+
+    // Scrub interaction (desktop hover)
+    let isScrubbing = false;
+
+    const startScrub = () => {
+      if (prefersReduced) return;
+      isHovering = true;
+      isScrubbing = true;
+      stop(); // pause auto-cycling while hovering
+    };
+
+    const moveScrub = (clientX: number) => {
+      if (!isScrubbing) return;
+      const video = videos[current];
+      if (!video || !video.duration) return;
+      const rect = stage?.getBoundingClientRect();
+      if (!rect) return;
+      const ratio = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
+      video.currentTime = ratio * video.duration;
+    };
+
+    const endScrub = () => {
+      isHovering = false;
+      isScrubbing = false;
+      resetVideo(videos[current]);
+      start(); // resume auto-cycling
+    };
+
+    if (stage) {
+      stage.addEventListener('pointerenter', (e) => {
+        if (e.pointerType === 'mouse') startScrub();
+      });
+      stage.addEventListener('pointermove', (e) => {
+        const evt = e as PointerEvent;
+        if (evt.pointerType === 'mouse') moveScrub(evt.clientX);
+      });
+      stage.addEventListener('pointerleave', (e) => {
+        const evt = e as PointerEvent;
+        if (evt.pointerType === 'mouse') endScrub();
+      });
+    }
+
+    // Pause cycling when hero is off-screen
+    if (stage && 'IntersectionObserver' in window) {
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) start();
+            else stop();
+          });
+        },
+        { threshold: 0.25 }
+      );
+      observer.observe(stage);
+    } else {
+      start();
+    }
+
+    dots.forEach((dot, i) => {
+      dot.addEventListener('click', () => {
+        show(i);
+        stop();
+        start();
+      });
+      dot.classList.add('cursor-pointer');
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initHeroCarousel);
+  } else {
+    initHeroCarousel();
+  }
+
+  document.addEventListener('astro:before-preparation', initHeroCarousel);
+</script>

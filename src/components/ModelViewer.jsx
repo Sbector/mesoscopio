@@ -52,7 +52,7 @@ export default function ModelViewer({ model }) {
   };
 
   return (
-    <div ref={containerRef} className="model-viewer-container relative w-full h-125 bg-earth-50 rounded-xl overflow-hidden">
+    <div ref={containerRef} className="model-viewer-container relative w-full h-full bg-earth-50 rounded-xl overflow-hidden">
       <Canvas camera={{ position: [0, 0, 5], fov: 50 }}>
         <color attach="background" args={['#F9FAFB']} />
         <ambientLight intensity={0.6} />

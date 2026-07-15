@@ -1,10 +1,17 @@
 ---
 import Layout from "@/layouts/Layout.astro";
-import ModelsGrid from "@/components/ModelsGrid.astro";
+import HeroSection from "@/components/HeroSection.astro";
 import { getCollection } from "astro:content";
 
-// Get models
+// Get models for the hero videos
 const modelos = await getCollection("modelos");
+
+// Get landing copy from home.md
+const landingDocs = await getCollection("landing");
+const landing = landingDocs[0]?.data ?? {
+  description_en: "",
+  description_es: "",
+};
 ---
 
 <Layout
@@ -12,7 +19,11 @@ const modelos = await getCollection("modelos");
   description="Explore our collection of high-fidelity 3D scans"
   lang="es"
 >
-  <main class="grow">
-    <ModelsGrid models={modelos} />
+  <main class="grow h-full">
+    <HeroSection
+      models={modelos}
+      descEn={landing.description_en}
+      descEs={landing.description_es}
+    />
   </main>
 </Layout>
